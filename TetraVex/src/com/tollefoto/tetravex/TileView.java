@@ -24,6 +24,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.view.View;
 
 /*
@@ -32,6 +33,8 @@ import android.view.View;
  * 
  */
 public class TileView extends View {
+
+	final static int NUMBERTEXTSIZE = 18;
 
 	/* Number */
 	Paint mNumberPaint;
@@ -59,6 +62,11 @@ public class TileView extends View {
 	int mNumberColorMap[] = {Color.BLACK, Color.BLUE, Color.rgb(29,217,224), Color.LTGRAY, Color.rgb(51,213,59),
 			Color.RED, Color.rgb(205,43,207), Color.WHITE, Color.rgb(222, 224, 29), Color.rgb(251,121,6)};
 
+
+	public TileView(Context context, AttributeSet attrs) {
+		super(context, attrs);
+		init();
+	}
 	 public TileView(Context context, AttributeSet attrs, TileData td) {
 	        super(context, attrs);
 
@@ -125,13 +133,13 @@ public class TileView extends View {
 		 super.onSizeChanged(w, h, oldw, oldh);
 		 // Calculate location of number labels
 		 mLeftNumberX = (w / 4) - (mNumberWidth / 2);
-		 mLeftNumberY = h / 2  + (mNumberHeight / 2);
+		 mLeftNumberY = h / 2  + (mNumberHeight / 4);
 
 		 mRightNumberX = (w - (w / 4)) - (mNumberWidth / 2);
-		 mRightNumberY = (h / 2) + (mNumberHeight / 2);
+		 mRightNumberY = (h / 2) + (mNumberHeight / 4);
 
 		 mTopNumberX = (w / 2) - (mNumberWidth / 2);
-		 mTopNumberY = (h / 4);
+		 mTopNumberY = (h / 4) + (mNumberHeight / 4);
 
 		 mBottomNumberX = (w / 2) - (mNumberWidth / 2);
 		 mBottomNumberY = (h  - (h / 4)) + (mNumberHeight / 2);
@@ -177,6 +185,9 @@ public class TileView extends View {
 	 private void init() {
 		   mNumberPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		   mNumberPaint.setColor(mNumberColor);
+		   DisplayMetrics dm = getContext().getResources().getDisplayMetrics();
+		   float pixelSize = NUMBERTEXTSIZE * dm.scaledDensity; 
+		   mNumberPaint.setTextSize(pixelSize);
 		   if (mNumberHeight == 0) {
 		       mNumberHeight = mNumberPaint.getTextSize();
 		       mNumberWidth = mNumberPaint.measureText(mLeftNumberLabel);

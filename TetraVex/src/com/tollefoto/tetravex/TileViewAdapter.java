@@ -53,13 +53,13 @@ public class TileViewAdapter extends BaseAdapter {
     }
 
     // create a new ImageView for each item referenced by the Adapter
-    public View getView(int position, View convertView, ViewGroup parent) {
+	public View getView(int position, View convertView, ViewGroup parent) {
         TileView tileView;
         if (convertView == null) {  // if it's not recycled, initialize some attributes
         	TileData td = mGameBoardData.getData(position);
             tileView = new TileView(mContext, null, td);
-            int h = mContext.getResources().getDisplayMetrics().densityDpi;
-            tileView.setLayoutParams(new GridView.LayoutParams(h-60, h-65));
+            int w = mContext.getResources().getDisplayMetrics().widthPixels;
+            tileView.setLayoutParams(new GridView.LayoutParams(w/mGameBoardData.mBoardSize-5, w/mGameBoardData.mBoardSize-5));
             tileView.setPadding(0, 0, 0, 0);
             mThumbIds[position] = tileView;
         } else {

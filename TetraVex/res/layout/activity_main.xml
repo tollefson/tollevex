@@ -33,7 +33,7 @@ limitations under the License.
 <GridView
     android:id="@+id/gridview"
     android:layout_width="fill_parent"
-    android:layout_height="match_parent"
+    android:layout_height="fill_parent"
     android:clipToPadding="false"
     android:gravity="center"
     android:horizontalSpacing="1dp"
@@ -41,4 +41,9 @@ limitations under the License.
     android:stretchMode="columnWidth"
     android:verticalSpacing="1dp" />
 
+<TextView
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:padding="24dp"
+	    android:text="@string/app_name"/>
 </LinearLayout>

@@ -62,7 +62,7 @@ public class MainActivity extends Activity {
 	        		((TileViewAdapter)(parent.getAdapter())).notifyDataSetChanged();
 	        		if(((TileViewAdapter)(parent.getAdapter())).winner()) {
 	        			timer.stop();
-	        			Toast.makeText(MainActivity.this, "YOU WIN!!!!", Toast.LENGTH_LONG).show();
+	        			Toast.makeText(MainActivity.this, "You are a winner!!!!", Toast.LENGTH_LONG).show();
 	        		}
 	        	} else {
 	        		mSelectedPosition = position;
