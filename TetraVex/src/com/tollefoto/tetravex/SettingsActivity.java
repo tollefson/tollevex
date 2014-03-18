@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+/*
 tollevex - a tetravex like game
 
 Copyright 2014 Jon Tollefson <jon@tollefoto.com>
@@ -15,14 +14,17 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
--->
+*/
+package com.tollefoto.tetravex;
 
-<resources>
+import android.os.Bundle;
+import android.preference.PreferenceActivity;
 
-    <string name="app_name">TolleVex</string>
-    <string name="action_settings">Settings</string>
-    <string name="pref_boardsize">Board Dimensions</string>
-    <string name="pref_boardsize_default">3</string>
-    <string name="pref_display_timer">Timer</string>
-    <string name="pref_display_timer_summ">Display game timer</string>
-</resources>
+public class SettingsActivity extends PreferenceActivity {
+    @SuppressWarnings("deprecation")
+	@Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        addPreferencesFromResource(R.xml.preferences);
+    }
+}
