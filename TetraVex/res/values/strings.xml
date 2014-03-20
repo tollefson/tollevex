@@ -21,6 +21,7 @@ limitations under the License.
 
     <string name="app_name">TolleVex</string>
     <string name="action_settings">Settings</string>
+    <string name="action_newgame">New Game</string>
     <string name="pref_boardsize">Board Dimensions</string>
     <string name="pref_boardsize_default">3</string>
     <string name="pref_display_timer">Timer</string>

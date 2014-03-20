@@ -39,8 +39,21 @@ public class MainActivity extends Activity {
 	final static int NOTSELECTEDPOSITION = -1;
 	/* The selected tile. */
 	int mSelectedPosition = NOTSELECTEDPOSITION;
+	private SharedPreferences sharedPrefs;
 	private Chronometer timer;
 	private SharedPreferences.OnSharedPreferenceChangeListener listener;
+	private GameBoardData gbd;
+	private GridView gridview;
+
+	private void newGame() {
+		String numberofcolumns = sharedPrefs.getString("pref_boardsize", "3");
+
+	    gbd = new GameBoardData(Integer.parseInt(numberofcolumns));
+	    gridview.setAdapter(new TileViewAdapter(this, gbd));
+	    gridview.setNumColumns(gbd.mBoardSize);
+	    timer.setBase(SystemClock.elapsedRealtime());
+	    timer.start();
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -49,12 +62,11 @@ public class MainActivity extends Activity {
 		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
-		SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+		sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
  
 		boolean displayTimer = sharedPrefs.getBoolean("pref_display_timer", false);
 		if(!displayTimer)
 			findViewById(R.id.timer).setVisibility(View.INVISIBLE);
-		String numberofcolumns = sharedPrefs.getString("pref_boardsize", "3");
 		
 		listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
 			  public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
@@ -66,15 +78,10 @@ public class MainActivity extends Activity {
 				  }
 			  }
 			};
-			sharedPrefs.registerOnSharedPreferenceChangeListener(listener);
+		sharedPrefs.registerOnSharedPreferenceChangeListener(listener);
 
-	    final GridView gridview = (GridView) findViewById(R.id.gridview);
-	    GameBoardData gbd = new GameBoardData(Integer.parseInt(numberofcolumns));
-	    gridview.setAdapter(new TileViewAdapter(this, gbd));
-	    gridview.setNumColumns(gbd.mBoardSize);
 	    timer = (Chronometer) findViewById(R.id.timer);
-	    timer.setBase(SystemClock.elapsedRealtime());
-	    timer.start();
+	    gridview = (GridView) findViewById(R.id.gridview);
 
 	    gridview.setOnItemClickListener(new OnItemClickListener() {
 	        public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
@@ -95,6 +102,8 @@ public class MainActivity extends Activity {
 	        	}
 	        }
 	    });
+
+	    newGame();
 	}
 
 	@Override
@@ -106,11 +115,16 @@ public class MainActivity extends Activity {
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
-		Intent intent = new Intent(this, SettingsActivity.class);
-		startActivity(intent);
-		return true;
+	    switch (item.getItemId()) {
+	    case R.id.action_newgame:
+	        newGame();
+	        return true;
+	    case R.id.action_settings:
+			Intent intent = new Intent(this, SettingsActivity.class);
+			startActivity(intent);
+	        return true;
+	    default:
+	        return super.onOptionsItemSelected(item);
+	    }
 	}
-
-
 }
-
