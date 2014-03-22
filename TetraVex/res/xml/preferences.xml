@@ -25,8 +25,13 @@ limitations under the License.
         android:entryValues="@array/pref_boardsize_values"
         android:defaultValue="@string/pref_boardsize_default" />
     <CheckBoxPreference
-        android:key="pref_display_timer"
+        android:key="@string/pref_display_timer_key"
         android:title="@string/pref_display_timer"
         android:summary="@string/pref_display_timer_summ"
+        android:defaultValue="false" />
+    <CheckBoxPreference
+        android:key="@string/pref_display_moves_key"
+        android:title="@string/pref_display_moves"
+        android:summary="@string/pref_display_moves_summ"
         android:defaultValue="false" />
 </PreferenceScreen>

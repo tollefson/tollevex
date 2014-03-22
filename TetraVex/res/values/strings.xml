@@ -18,12 +18,18 @@ limitations under the License.
 -->
 
 <resources>
-
     <string name="app_name">TolleVex</string>
+    <string name="moves_label">Moves</string>
+    <string name="moves_value">0</string>
     <string name="action_settings">Settings</string>
     <string name="action_newgame">New Game</string>
     <string name="pref_boardsize">Board Dimensions</string>
     <string name="pref_boardsize_default">3</string>
     <string name="pref_display_timer">Timer</string>
     <string name="pref_display_timer_summ">Display game timer</string>
+    <string name="pref_display_moves">Moves</string>
+    <string name="pref_display_moves_summ">Display move count</string>
+    <string name="pref_display_timer_key">pref_display_timer</string>
+    <string name="pref_boardsize_key">pref_boardsize</string>
+    <string name="pref_display_moves_key">pref_display_moves</string>
 </resources>

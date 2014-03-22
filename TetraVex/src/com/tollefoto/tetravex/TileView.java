@@ -47,7 +47,7 @@ public class TileView extends View {
 	String mLeftNumberLabel, mRightNumberLabel, mTopNumberLabel, mBottomNumberLabel;
 
 	/* Quadrant */
-	Paint mLeftPaint, mRightPaint, mTopPaint, mBottomPaint;
+	Paint mQuadPaint;
 	int mBorderColor = Color.DKGRAY;
 	int mLeftColor, mRightColor, mTopColor, mBottomColor;
 	float mCenterX, mCenterY;
@@ -59,8 +59,8 @@ public class TileView extends View {
 	float mBottomRightX, mBottomRightY;
 
 	/* Map numbers, 1 to 9, to unique color */
-	int mNumberColorMap[] = {Color.BLACK, Color.BLUE, Color.rgb(29,217,224), Color.LTGRAY, Color.rgb(51,213,59),
-			Color.RED, Color.rgb(205,43,207), Color.WHITE, Color.rgb(222, 224, 29), Color.rgb(251,121,6)};
+	int mNumberColorMap[] = {Color.BLACK, Color.rgb(11,124,196), Color.rgb(29,217,224), Color.rgb(186,186,186), Color.rgb(51,213,59),
+			Color.rgb(251,23,68), Color.rgb(205,43,207), Color.WHITE, Color.rgb(222, 224, 29), Color.rgb(251,121,6)};
 
 
 	public TileView(Context context, AttributeSet attrs) {
@@ -88,38 +88,38 @@ public class TileView extends View {
 
 		 // Draw triangles
 		 //Left
-		 mLeftPaint.setStrokeWidth(mTrianglePathStrokeWidth);
-		 mLeftPaint.setColor(mNumberColorMap[mLeftColor]);
-		 canvas.drawPath(mLeftTriangle, mLeftPaint);
+		 mQuadPaint.setStrokeWidth(mTrianglePathStrokeWidth);
+		 mQuadPaint.setColor(mNumberColorMap[mLeftColor]);
+		 canvas.drawPath(mLeftTriangle, mQuadPaint);
 
 		 //Right
-		 mLeftPaint.setColor(mNumberColorMap[mRightColor]);
-		 canvas.drawPath(mRightTriangle, mLeftPaint);
+		 mQuadPaint.setColor(mNumberColorMap[mRightColor]);
+		 canvas.drawPath(mRightTriangle, mQuadPaint);
 
 		 //Top
-		 mLeftPaint.setColor(mNumberColorMap[mTopColor]);
-		 canvas.drawPath(mTopTriangle, mLeftPaint);
+		 mQuadPaint.setColor(mNumberColorMap[mTopColor]);
+		 canvas.drawPath(mTopTriangle, mQuadPaint);
 
 		 //Bottom
-		 mLeftPaint.setColor(mNumberColorMap[mBottomColor]);
-		 canvas.drawPath(mBottomTriangle, mLeftPaint);
+		 mQuadPaint.setColor(mNumberColorMap[mBottomColor]);
+		 canvas.drawPath(mBottomTriangle, mQuadPaint);
 
-		 mLeftPaint.setColor(mBorderColor);
-		 canvas.drawLine(mCenterX, mCenterY, mTopLeftX, mTopLeftY, mLeftPaint);
-		 canvas.drawLine(mCenterX, mCenterY, mBottomLeftX, mBottomLeftY, mLeftPaint);
-		 canvas.drawLine(mTopLeftX, mTopLeftY, mBottomLeftX, mBottomLeftY, mLeftPaint);
-		 mLeftPaint.setColor(mBorderColor);
-		 canvas.drawLine(mCenterX, mCenterY, mTopRightX, mTopRightY, mLeftPaint);
-		 canvas.drawLine(mCenterX, mCenterY, mBottomRightX, mBottomRightY, mLeftPaint);
-		 canvas.drawLine(mBottomRightX, mBottomRightY, mTopRightX, mTopRightY, mLeftPaint);
-		 mLeftPaint.setColor(mBorderColor);
-		 canvas.drawLine(mCenterX, mCenterY, mTopLeftX, mTopLeftY, mLeftPaint);
-		 canvas.drawLine(mCenterX, mCenterY, mBottomRightX, mBottomRightY, mLeftPaint);
-		 canvas.drawLine(mTopLeftX, mTopLeftY, mTopRightX, mTopRightY, mLeftPaint);
-		 mLeftPaint.setColor(mBorderColor);
-		 canvas.drawLine(mCenterX, mCenterY, mBottomRightX, mBottomRightY, mLeftPaint);
-		 canvas.drawLine(mCenterX, mCenterY, mBottomLeftX, mBottomLeftY, mLeftPaint);
-		 canvas.drawLine(mBottomLeftX, mBottomLeftY, mBottomRightX, mBottomRightY, mLeftPaint);
+		 mQuadPaint.setColor(mBorderColor);
+		 canvas.drawLine(mCenterX, mCenterY, mTopLeftX, mTopLeftY, mQuadPaint);
+		 canvas.drawLine(mCenterX, mCenterY, mBottomLeftX, mBottomLeftY, mQuadPaint);
+		 canvas.drawLine(mTopLeftX, mTopLeftY, mBottomLeftX, mBottomLeftY, mQuadPaint);
+		 mQuadPaint.setColor(mBorderColor);
+		 canvas.drawLine(mCenterX, mCenterY, mTopRightX, mTopRightY, mQuadPaint);
+		 canvas.drawLine(mCenterX, mCenterY, mBottomRightX, mBottomRightY, mQuadPaint);
+		 canvas.drawLine(mBottomRightX, mBottomRightY, mTopRightX, mTopRightY, mQuadPaint);
+		 mQuadPaint.setColor(mBorderColor);
+		 canvas.drawLine(mCenterX, mCenterY, mTopLeftX, mTopLeftY, mQuadPaint);
+		 canvas.drawLine(mCenterX, mCenterY, mBottomRightX, mBottomRightY, mQuadPaint);
+		 canvas.drawLine(mTopLeftX, mTopLeftY, mTopRightX, mTopRightY, mQuadPaint);
+		 mQuadPaint.setColor(mBorderColor);
+		 canvas.drawLine(mCenterX, mCenterY, mBottomRightX, mBottomRightY, mQuadPaint);
+		 canvas.drawLine(mCenterX, mCenterY, mBottomLeftX, mBottomLeftY, mQuadPaint);
+		 canvas.drawLine(mBottomLeftX, mBottomLeftY, mBottomRightX, mBottomRightY, mQuadPaint);
 
 		 
 		 //Draw the number in each triangle
@@ -195,8 +195,8 @@ public class TileView extends View {
 		       mNumberPaint.setTextSize(mNumberHeight);
 		   }
 
-		   mLeftPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-		   mLeftPaint.setColor(mBorderColor);
+		   mQuadPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+		   mQuadPaint.setColor(mBorderColor);
 	 }
 
 }

@@ -32,6 +32,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Chronometer;
 import android.widget.GridView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends Activity {
@@ -39,18 +40,22 @@ public class MainActivity extends Activity {
 	final static int NOTSELECTEDPOSITION = -1;
 	/* The selected tile. */
 	int mSelectedPosition = NOTSELECTEDPOSITION;
+	int mNumberOfMoves = 0;
 	private SharedPreferences sharedPrefs;
 	private Chronometer timer;
 	private SharedPreferences.OnSharedPreferenceChangeListener listener;
 	private GameBoardData gbd;
 	private GridView gridview;
+	private TextView mMovesTextView;
 
 	private void newGame() {
-		String numberofcolumns = sharedPrefs.getString("pref_boardsize", "3");
+		String numberofcolumns = sharedPrefs.getString(getString(R.string.pref_boardsize_key), "3");
 
 	    gbd = new GameBoardData(Integer.parseInt(numberofcolumns));
 	    gridview.setAdapter(new TileViewAdapter(this, gbd));
 	    gridview.setNumColumns(gbd.mBoardSize);
+	    mNumberOfMoves = 0;
+	    mMovesTextView.setText(Integer.toString(mNumberOfMoves));
 	    timer.setBase(SystemClock.elapsedRealtime());
 	    timer.start();
 	}
@@ -64,18 +69,34 @@ public class MainActivity extends Activity {
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 		sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
  
-		boolean displayTimer = sharedPrefs.getBoolean("pref_display_timer", false);
+		boolean displayTimer = sharedPrefs.getBoolean(getString(R.string.pref_display_timer_key), false);
 		if(!displayTimer)
 			findViewById(R.id.timer).setVisibility(View.INVISIBLE);
-		
+
+		mMovesTextView = (TextView)findViewById(R.id.movesview);
+		boolean displayMoves = sharedPrefs.getBoolean(getString(R.string.pref_display_moves_key), false);
+		if(!displayMoves) {
+			mMovesTextView.setVisibility(View.INVISIBLE);
+			findViewById(R.id.label_movesview).setVisibility(View.INVISIBLE);
+		}
+
 		listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
 			  public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
-				  if(key.equals("pref_display_timer")) {
+				  if(key.equals(getString(R.string.pref_display_timer_key))) {
 					  if(prefs.getBoolean(key, false))
 						  findViewById(R.id.timer).setVisibility(View.VISIBLE);
 					  else
 						  findViewById(R.id.timer).setVisibility(View.INVISIBLE);
-				  }
+				  } else if(key.equals(getString(R.string.pref_display_moves_key))) {
+					  if(prefs.getBoolean(key, false)) {
+						  mMovesTextView.setVisibility(View.VISIBLE);
+						  findViewById(R.id.label_movesview).setVisibility(View.VISIBLE);
+					  }
+					  else {
+						  mMovesTextView.setVisibility(View.INVISIBLE);
+						  findViewById(R.id.label_movesview).setVisibility(View.INVISIBLE);
+					  }
+				 }
 			  }
 			};
 		sharedPrefs.registerOnSharedPreferenceChangeListener(listener);
@@ -89,16 +110,20 @@ public class MainActivity extends Activity {
 	        		//Toast.makeText(MainActivity.this, "swapping " + position + " with " + mSelectedPosition, Toast.LENGTH_SHORT).show();
 	        		//swap positions
 	        		((TileViewAdapter)(parent.getAdapter())).setItem(position, mSelectedPosition);
+	        		++mNumberOfMoves;
+	        		mMovesTextView.setText(Integer.toString(mNumberOfMoves));
 	        		mSelectedPosition = NOTSELECTEDPOSITION;
 	        		((TileViewAdapter)(parent.getAdapter())).notifyDataSetChanged();
 	        		if(((TileViewAdapter)(parent.getAdapter())).winner()) {
 	        			timer.stop();
 	        			Toast.makeText(MainActivity.this, "You are a winner!!!!", Toast.LENGTH_LONG).show();
 	        		}
-	        	} else {
+	        	}
+	        	else {
 	        		mSelectedPosition = position;
-	        		v.setSelected(true);
-	        		v.requestFocusFromTouch();
+	        		TileView tv = (TileView)(((TileViewAdapter)(parent.getAdapter())).getItem(position));
+	        		tv.setSelected(true);
+	        		tv.requestFocusFromTouch();
 	        	}
 	        }
 	    });

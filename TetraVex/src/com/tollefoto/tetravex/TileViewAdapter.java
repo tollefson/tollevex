@@ -38,17 +38,17 @@ public class TileViewAdapter extends BaseAdapter {
     }
 
     public Object getItem(int position) {
-        return 0;
+        return mTileIds[position];
     }
 
     public long getItemId(int position) {
         return position;
     }
-    
+
     public void setItem(int position, int position2) {
-    	TileView tv = mThumbIds[position];
-    	mThumbIds[position] = mThumbIds[position2];
-    	mThumbIds[position2] = tv;
+    	TileView tv = mTileIds[position];
+    	mTileIds[position] = mTileIds[position2];
+    	mTileIds[position2] = tv;
     	mGameBoardData.swap(position, position2);
     }
 
@@ -61,9 +61,9 @@ public class TileViewAdapter extends BaseAdapter {
             int w = mContext.getResources().getDisplayMetrics().widthPixels;
             tileView.setLayoutParams(new GridView.LayoutParams(w/mGameBoardData.mBoardSize-5, w/mGameBoardData.mBoardSize-5));
             tileView.setPadding(0, 0, 0, 0);
-            mThumbIds[position] = tileView;
+            mTileIds[position] = tileView;
         } else {
-            tileView = mThumbIds[position];//(TileView)convertView;
+            tileView = mTileIds[position];//(TileView)convertView;
         }
 
         return tileView;
@@ -74,8 +74,9 @@ public class TileViewAdapter extends BaseAdapter {
     	boolean w = mGameBoardData.winner();
     	return w;
     }
+
     // references to our images
-   private TileView [] mThumbIds = {null, null, null, null, null,
+   private TileView [] mTileIds = {null, null, null, null, null,
 		   null, null, null, null, null,
 		   null, null, null, null, null,
 		   null, null, null, null, null,
