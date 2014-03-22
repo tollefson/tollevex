@@ -38,27 +38,34 @@ import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
-	final static int NOTSELECTEDPOSITION = -1;
+	private final static int NOTSELECTEDPOSITION = -1;
+
 	/* The selected tile. */
 	int mSelectedPosition = NOTSELECTEDPOSITION;
 	int mNumberOfMoves = 0;
 	private SharedPreferences sharedPrefs;
-	private Chronometer timer;
-	private SharedPreferences.OnSharedPreferenceChangeListener listener;
-	private GameBoardData gbd;
-	private GridView gridview;
+	private Chronometer mTimer;
+	private long mPauseTime = 0;
+	private SharedPreferences.OnSharedPreferenceChangeListener mSharedPreflistener;
+	private GameBoardData mGbd;
+	private GridView mGridview;
 	private TextView mMovesTextView;
 
 	private void newGame() {
 		String numberofcolumns = sharedPrefs.getString(getString(R.string.pref_boardsize_key), "3");
 
-	    gbd = new GameBoardData(Integer.parseInt(numberofcolumns));
-	    gridview.setAdapter(new TileViewAdapter(this, gbd));
-	    gridview.setNumColumns(gbd.mBoardSize);
+	    mGbd = new GameBoardData(Integer.parseInt(numberofcolumns));
+	    mGridview.setAdapter(new TileViewAdapter(this, mGbd));
+	    mGridview.setNumColumns(mGbd.mBoardSize);
 	    mNumberOfMoves = 0;
 	    mMovesTextView.setText(Integer.toString(mNumberOfMoves));
-	    timer.setBase(SystemClock.elapsedRealtime());
-	    timer.start();
+		if(mPauseTime != 0)
+			mTimer.setBase(mTimer.getBase() + SystemClock.elapsedRealtime() - mPauseTime);
+		else
+			mTimer.setBase(SystemClock.elapsedRealtime());
+		mPauseTime = 0;
+
+	    mTimer.start();
 	}
 
 	@Override
@@ -81,7 +88,7 @@ public class MainActivity extends Activity {
 			findViewById(R.id.label_movesview).setVisibility(View.INVISIBLE);
 		}
 
-		listener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+		mSharedPreflistener = new SharedPreferences.OnSharedPreferenceChangeListener() {
 			  public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
 				  if(key.equals(getString(R.string.pref_display_timer_key))) {
 					  if(prefs.getBoolean(key, false))
@@ -100,15 +107,14 @@ public class MainActivity extends Activity {
 				 }
 			  }
 			};
-		sharedPrefs.registerOnSharedPreferenceChangeListener(listener);
+		sharedPrefs.registerOnSharedPreferenceChangeListener(mSharedPreflistener);
 
-	    timer = (Chronometer) findViewById(R.id.timer);
-	    gridview = (GridView) findViewById(R.id.gridview);
+	    mTimer = (Chronometer) findViewById(R.id.timer);
+	    mGridview = (GridView) findViewById(R.id.gridview);
 
-	    gridview.setOnItemClickListener(new OnItemClickListener() {
+	    mGridview.setOnItemClickListener(new OnItemClickListener() {
 	        public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
 	        	if(mSelectedPosition != NOTSELECTEDPOSITION && mSelectedPosition != position) {
-	        		//Toast.makeText(MainActivity.this, "swapping " + position + " with " + mSelectedPosition, Toast.LENGTH_SHORT).show();
 	        		//swap positions
 	        		((TileViewAdapter)(parent.getAdapter())).setItem(position, mSelectedPosition);
 	        		++mNumberOfMoves;
@@ -116,7 +122,7 @@ public class MainActivity extends Activity {
 	        		mSelectedPosition = NOTSELECTEDPOSITION;
 	        		((TileViewAdapter)(parent.getAdapter())).notifyDataSetChanged();
 	        		if(((TileViewAdapter)(parent.getAdapter())).winner()) {
-	        			timer.stop();
+	        			mTimer.stop();
 	        			Toast.makeText(MainActivity.this, "You are a winner!!!!", Toast.LENGTH_LONG).show();
 	        		}
 	        	}
@@ -130,6 +136,26 @@ public class MainActivity extends Activity {
 	    });
 
 	    newGame();
+	}
+
+	@Override
+	public void onPause() {
+		super.onPause();
+		mPauseTime = SystemClock.elapsedRealtime();
+		mTimer.stop();
+	}
+
+	@Override
+	public void onResume() {
+		super.onResume();
+		//don't start clock if they have already won
+		if(!((TileViewAdapter)(mGridview.getAdapter())).winner()) {
+			if(mPauseTime != 0) {
+				mTimer.setBase(mTimer.getBase() + SystemClock.elapsedRealtime() - mPauseTime);
+				mPauseTime = 0;
+			}
+				mTimer.start();
+		}
 	}
 
 	@Override
