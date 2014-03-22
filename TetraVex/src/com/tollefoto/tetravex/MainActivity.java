@@ -19,6 +19,7 @@ limitations under the License.
 package com.tollefoto.tetravex;
 
 import android.app.Activity;
+import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
@@ -148,6 +149,13 @@ public class MainActivity extends Activity {
 			Intent intent = new Intent(this, SettingsActivity.class);
 			startActivity(intent);
 	        return true;
+	    case R.id.action_help:
+	    	Dialog dialog = new Dialog(this);
+	    	dialog.setContentView(R.layout.activity_help);
+	    	dialog.setTitle(getString(R.string.app_name));
+	    	dialog.setCancelable(true);
+	    	dialog.show();
+	    	return true;
 	    default:
 	        return super.onOptionsItemSelected(item);
 	    }
