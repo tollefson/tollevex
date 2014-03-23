@@ -34,6 +34,6 @@ limitations under the License.
     <string name="pref_boardsize_key">pref_boardsize</string>
     <string name="pref_display_moves_key">pref_display_moves</string>
     <string name="help_text_value">     This is a tetravex like puzzle game.  Match tiles together with the same color edges against
-        each other.  You can swap tiles by touching one and then the other.  Tiles can not be rotated.</string>
+        each other.  Swap tiles by touching one and then the other.  Tiles can not be rotated.</string>
     <string name="about_text_value">Written by\nJon Tollefson &lt;jon@tollefoto.com&gt;</string>
 </resources>

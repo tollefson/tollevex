@@ -33,7 +33,6 @@ public class GameBoardData {
 	// Number of tiles in each direction
 	public int mBoardSize  = 3;
 	private TileData mGameBoard[][];
-	private TileData mSolutionGameBoard[][];
 
 	private static Random mRandom = new Random();
 
@@ -100,19 +99,30 @@ public class GameBoardData {
 	}
 
 	public boolean winner() {
+		/*
+		 * We don't need to compare when we get to the last tile in each row because
+		 * there is no tile to it's right, but we do have to check the tile above it -
+		 * except on the first row.
+		 */
 		for (int x = 1; x <= mBoardSize; ++x) {
 			for (int y = 1; y <= mBoardSize; ++y) {
-				if(!mGameBoard[x-1][y-1].equals(mSolutionGameBoard[x-1][y-1]))
-					return false;
+				if(x == 1) { //for top row just check the tile to the right
+					if(y!= mBoardSize && mGameBoard[x-1][y-1].mRight != mGameBoard[x-1][y].mLeft)
+						return false;
+				} else { //check the tile to the right and above on other rows
+					if(( y!= mBoardSize && mGameBoard[x-1][y-1].mRight != mGameBoard[x-1][y].mLeft))
+						return false;
+					if(mGameBoard[x-1][y-1].mTop != mGameBoard[x-2][y-1].mBottom)
+						return false;
+				}
 			}
 		}
-		return true; //all positions matched
+		return true; //all edges matched
 	}
 
 	//initialize the board with playable game values
 	private void init() {
 		mGameBoard = new TileData[mBoardSize][mBoardSize];
-		mSolutionGameBoard = new TileData[mBoardSize][mBoardSize];
 
 		TileData previousLeftTD = null;
 		TileData previousTopTD = null;
@@ -122,7 +132,6 @@ public class GameBoardData {
 					previousTopTD = mGameBoard[x-2][y-1];
 				TileData td = TileData.createWithLeft(previousLeftTD, previousTopTD);
 				mGameBoard[x-1][y-1] = td;
-				mSolutionGameBoard[x-1][y-1] = td;
 				previousLeftTD = td;
 			}
 		}

@@ -141,8 +141,11 @@ public class MainActivity extends Activity {
 	@Override
 	public void onPause() {
 		super.onPause();
-		mPauseTime = SystemClock.elapsedRealtime();
-		mTimer.stop();
+		//don't set pause time if they won or newgame() will be fooled
+		if(!((TileViewAdapter)(mGridview.getAdapter())).winner()) {
+			mPauseTime = SystemClock.elapsedRealtime();
+			mTimer.stop();
+		}
 	}
 
 	@Override
