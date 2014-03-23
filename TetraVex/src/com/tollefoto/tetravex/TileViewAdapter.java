@@ -63,7 +63,7 @@ public class TileViewAdapter extends BaseAdapter {
             tileView.setPadding(0, 0, 0, 0);
             mTileIds[position] = tileView;
         } else {
-            tileView = mTileIds[position];//(TileView)convertView;
+            tileView = mTileIds[position];
         }
 
         return tileView;
