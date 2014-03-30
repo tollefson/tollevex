@@ -18,8 +18,8 @@ limitations under the License.
 -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-  android:layout_width="fill_parent"
-  android:layout_height="fill_parent"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content"
   android:gravity="center"
   android:orientation="vertical" >
 
@@ -50,14 +50,22 @@ limitations under the License.
 			android:textSize="30sp" />
 </LinearLayout>
 
-<GridView
-    android:id="@+id/gridview"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    android:clipToPadding="false"
-    android:gravity="center"
-    android:horizontalSpacing="1dp"
-    android:orientation="vertical"
-    android:stretchMode="columnWidth"
-    android:verticalSpacing="1dp" />
+ <GridView
+     android:id="@+id/gridview"
+     android:layout_width="wrap_content"
+     android:layout_height="wrap_content"
+     android:clipToPadding="false"
+     android:gravity="center"
+     android:horizontalSpacing="1dp"
+     android:orientation="vertical"
+     android:stretchMode="columnWidth"
+     android:verticalSpacing="1dp" />
+
+    <Button
+      android:id="@+id/new_game_button"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:minWidth="175dp"
+      android:drawableLeft="@drawable/tetratile"
+      android:text="@string/new_game_button" />
 </LinearLayout>

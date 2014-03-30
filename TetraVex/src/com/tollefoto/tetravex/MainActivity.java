@@ -31,6 +31,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.Button;
 import android.widget.Chronometer;
 import android.widget.GridView;
 import android.widget.TextView;
@@ -50,6 +51,7 @@ public class MainActivity extends Activity {
 	private GameBoardData mGbd;
 	private GridView mGridview;
 	private TextView mMovesTextView;
+	private Button mNewGameButton;
 
 	private void newGame() {
 		String numberofcolumns = sharedPrefs.getString(getString(R.string.pref_boardsize_key), "3");
@@ -57,6 +59,7 @@ public class MainActivity extends Activity {
 	    mGbd = new GameBoardData(Integer.parseInt(numberofcolumns));
 	    mGridview.setAdapter(new TileViewAdapter(this, mGbd));
 	    mGridview.setNumColumns(mGbd.mBoardSize);
+	    mNewGameButton.setVisibility(View.INVISIBLE);
 	    mNumberOfMoves = 0;
 	    mMovesTextView.setText(Integer.toString(mNumberOfMoves));
 		if(mPauseTime != 0)
@@ -87,6 +90,15 @@ public class MainActivity extends Activity {
 			mMovesTextView.setVisibility(View.INVISIBLE);
 			findViewById(R.id.label_movesview).setVisibility(View.INVISIBLE);
 		}
+
+		mNewGameButton = (Button)findViewById(R.id.new_game_button);
+		mNewGameButton.setVisibility(View.INVISIBLE);
+		mNewGameButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				newGame();
+			}
+		});
 
 		mSharedPreflistener = new SharedPreferences.OnSharedPreferenceChangeListener() {
 			  public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
@@ -123,6 +135,7 @@ public class MainActivity extends Activity {
 	        		((TileViewAdapter)(parent.getAdapter())).notifyDataSetChanged();
 	        		if(((TileViewAdapter)(parent.getAdapter())).winner()) {
 	        			mTimer.stop();
+	        			mNewGameButton.setVisibility(View.VISIBLE);
 	        			Toast.makeText(MainActivity.this, "You are a winner!!!!", Toast.LENGTH_LONG).show();
 	        		}
 	        	}
