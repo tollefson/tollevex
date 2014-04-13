@@ -35,26 +35,32 @@ public class TileData {
 	public int mTop;
 	public int mBottom;
 
+	public boolean mHotLeft = false, mHotRight = false, mHotTop = false, mHotBottom = false;
+
 	private static Random mRandom = new Random();
-	
+
 	public TileData() {
 		mLeft = mRandom.nextInt(MAXVALUE) + 1;
 		mRight = mRandom.nextInt(MAXVALUE) + 1;
 		mTop = mRandom.nextInt(MAXVALUE) + 1;
 		mBottom = mRandom.nextInt(MAXVALUE) + 1;
+		setHot(false, false, false, false);
 	}
 	public TileData(int left, int right, int top, int bottom) {
 		mLeft = left;
 		mRight = right;
 		mTop = top;
 		mBottom = bottom;
+		setHot(false, false, false, false);
 	}
 	public TileData(TileData td) {
 		mLeft = td.mLeft;
 		mRight = td.mRight;
 		mTop = td.mTop;
 		mBottom = td.mBottom;
+		setHot(td.mHotLeft, td.mHotRight, mHotTop, mHotBottom);
 	}
+
 	public boolean equals(TileData td) {
 		return mLeft == td.mLeft && mRight == td.mRight && mTop == td.mTop && mBottom == td.mBottom;
 	}
@@ -74,6 +80,13 @@ public class TileData {
 				td = new TileData(left.mRight, getRandom(), top.mBottom, getRandom());
 		}
 		return td;
+	}
+
+	public void setHot(boolean left, boolean right, boolean top, boolean bottom) {
+		mHotLeft = left;
+		mHotRight = right;
+		mHotTop = top;
+		mHotBottom = bottom;
 	}
 
 	private static int getRandom() {

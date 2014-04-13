@@ -35,6 +35,7 @@ import android.view.View;
 public class TileView extends View {
 
 	final static int NUMBERTEXTSIZE = 18;
+	final static int HOTFACTOR = 3;
 
 	/* Number */
 	Paint mNumberPaint;
@@ -57,31 +58,61 @@ public class TileView extends View {
 	float mBottomLeftX, mBottomLeftY;
 	float mTopRightX, mTopRightY;
 	float mBottomRightX, mBottomRightY;
+	
+	private TileData mTileData;
+
+
+	/**
+	 * A triangle that is hot means the outside portion of a hot triangle will be drawn with a thicker line.
+	 */
+	int mLeftHot, mRightHot, mTopHot, mBottomHot = 0;
+	
 
 	/* Map numbers, 1 to 9, to unique color */
 	int mNumberColorMap[] = {Color.BLACK, Color.rgb(11,124,196), Color.rgb(29,217,224), Color.rgb(186,186,186), Color.rgb(51,213,59),
-			Color.rgb(251,23,68), Color.rgb(205,43,207), Color.WHITE, Color.rgb(222, 224, 29), Color.rgb(251,121,6)};
+			Color.rgb(251,23,68), Color.rgb(205,43,207), Color.rgb(86,150,28), Color.rgb(222, 224, 29), Color.rgb(251,121,6)};
 
 
 	public TileView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		init();
+		mTileData = null;
 	}
 	 public TileView(Context context, AttributeSet attrs, TileData td) {
 	        super(context, attrs);
+	        mTileData = td;
 
-	        if(td != null) {
-		        mLeftColor = td.mLeft;
+	        if(mTileData != null) {
+		        mLeftColor = mTileData.mLeft;
 		        mLeftNumberLabel = Integer.toString(mLeftColor);
-		        mRightColor = td.mRight;
+		        mRightColor = mTileData.mRight;
 		        mRightNumberLabel = Integer.toString(mRightColor);
-		        mTopColor = td.mTop;
+		        mTopColor = mTileData.mTop;
 		        mTopNumberLabel = Integer.toString(mTopColor);
-		        mBottomColor = td.mBottom;
+		        mBottomColor = mTileData.mBottom;
 		        mBottomNumberLabel = Integer.toString(mBottomColor);
 	        }
 	        init();
 	    }
+
+	 public void setHot(boolean left, boolean right, boolean top, boolean bottom) {
+		 if(left)
+			 mLeftHot = HOTFACTOR;
+		 else
+			 mLeftHot = 0;
+		 if(right)
+			 mRightHot = HOTFACTOR;
+		 else
+			 mRightHot = 0;
+		 if(top)
+			 mTopHot = HOTFACTOR;
+		 else
+			 mTopHot = 0;
+		 if(bottom)
+			 mBottomHot = HOTFACTOR;
+		 else
+			 mBottomHot = 0;
+	 }
 
 	 protected void onDraw(Canvas canvas) {
 		 super.onDraw(canvas);
@@ -104,22 +135,37 @@ public class TileView extends View {
 		 mQuadPaint.setColor(mNumberColorMap[mBottomColor]);
 		 canvas.drawPath(mBottomTriangle, mQuadPaint);
 
-		 mQuadPaint.setColor(mBorderColor);
+		 if(isSelected())
+			 mQuadPaint.setColor(Color.WHITE);
+		 else
+			 mQuadPaint.setColor(mBorderColor);
+		 // Left triangle
 		 canvas.drawLine(mCenterX, mCenterY, mTopLeftX, mTopLeftY, mQuadPaint);
 		 canvas.drawLine(mCenterX, mCenterY, mBottomLeftX, mBottomLeftY, mQuadPaint);
+		 mQuadPaint.setStrokeWidth(mTrianglePathStrokeWidth + (mTileData.mHotLeft ? HOTFACTOR : 0));
 		 canvas.drawLine(mTopLeftX, mTopLeftY, mBottomLeftX, mBottomLeftY, mQuadPaint);
-		 mQuadPaint.setColor(mBorderColor);
+		 mQuadPaint.setStrokeWidth(mTrianglePathStrokeWidth);
+
+		 // Right triangle
 		 canvas.drawLine(mCenterX, mCenterY, mTopRightX, mTopRightY, mQuadPaint);
 		 canvas.drawLine(mCenterX, mCenterY, mBottomRightX, mBottomRightY, mQuadPaint);
+		 mQuadPaint.setStrokeWidth(mTrianglePathStrokeWidth + (mTileData.mHotRight ? HOTFACTOR : 0));
 		 canvas.drawLine(mBottomRightX, mBottomRightY, mTopRightX, mTopRightY, mQuadPaint);
-		 mQuadPaint.setColor(mBorderColor);
+		 mQuadPaint.setStrokeWidth(mTrianglePathStrokeWidth);
+		 
+		 // Top triangle
 		 canvas.drawLine(mCenterX, mCenterY, mTopLeftX, mTopLeftY, mQuadPaint);
 		 canvas.drawLine(mCenterX, mCenterY, mBottomRightX, mBottomRightY, mQuadPaint);
+		 mQuadPaint.setStrokeWidth(mTrianglePathStrokeWidth + (mTileData.mHotTop ? HOTFACTOR : 0));
 		 canvas.drawLine(mTopLeftX, mTopLeftY, mTopRightX, mTopRightY, mQuadPaint);
-		 mQuadPaint.setColor(mBorderColor);
+		 mQuadPaint.setStrokeWidth(mTrianglePathStrokeWidth);
+		 
+		 // Bottom triangle
 		 canvas.drawLine(mCenterX, mCenterY, mBottomRightX, mBottomRightY, mQuadPaint);
 		 canvas.drawLine(mCenterX, mCenterY, mBottomLeftX, mBottomLeftY, mQuadPaint);
+		 mQuadPaint.setStrokeWidth(mTrianglePathStrokeWidth + (mTileData.mHotBottom ? HOTFACTOR : 0));
 		 canvas.drawLine(mBottomLeftX, mBottomLeftY, mBottomRightX, mBottomRightY, mQuadPaint);
+		 mQuadPaint.setStrokeWidth(mTrianglePathStrokeWidth);
 
 		 
 		 //Draw the number in each triangle
@@ -131,6 +177,7 @@ public class TileView extends View {
 
 	 protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 		 super.onSizeChanged(w, h, oldw, oldh);
+		 w = (w-(mTrianglePathStrokeWidth));
 		 // Calculate location of number labels
 		 mLeftNumberX = (w / 4) - (mNumberWidth / 2);
 		 mLeftNumberY = h / 2  + (mNumberHeight / 4);
@@ -186,6 +233,7 @@ public class TileView extends View {
 		   mNumberPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 		   mNumberPaint.setColor(mNumberColor);
 		   DisplayMetrics dm = getContext().getResources().getDisplayMetrics();
+		   mTrianglePathStrokeWidth =  3;
 		   float pixelSize = NUMBERTEXTSIZE * dm.scaledDensity; 
 		   mNumberPaint.setTextSize(pixelSize);
 		   if (mNumberHeight == 0) {
