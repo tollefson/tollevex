@@ -80,18 +80,18 @@ public class GameBoardData {
 			for (y = 1; y <= mBoardSize; ++y) {
 				if (position1 == pos) {
 					pos1Data = mGameBoard[x-1][y-1];
-					mGameBoard[x-1][y-1] = getData(position2);
+					setData(x-1, y-1, getData(position2));
 				}
 				pos = pos + 1;
 			}
 		}
 
-		//locate and set pos1 at pos2
+		//locate and set pos1 data at pos2
 		pos = 0;
 		for (x = 1; x <= mBoardSize; ++x) {
 			for (y = 1; y <= mBoardSize; ++y) {
 				if (position2 == pos) {
-					mGameBoard[x-1][y-1] = pos1Data;
+					setData(x-1, y-1, pos1Data);
 				}
 				pos = pos + 1;
 			}
@@ -131,23 +131,36 @@ public class GameBoardData {
 				if(x > 1)
 					previousTopTD = mGameBoard[x-2][y-1];
 				TileData td = TileData.createWithLeft(previousLeftTD, previousTopTD);
-				mGameBoard[x-1][y-1] = td;
+				setData(x-1, y-1, td);
 				previousLeftTD = td;
 			}
 		}
 		scramble();
 	}
 	
+	//sets the TileData at the given location
+	private void setData(int x, int y, TileData td) {
+		mGameBoard[x][y] = td;
+		return;
+	}
+
 	//randomize the playing board for more fun
 	private void scramble() {
+		TileData temp;
 		for (int x = 1; x <= mBoardSize; ++x) {
 			for (int y = 1; y <= mBoardSize; ++y) {
 				int newX = mRandom.nextInt(mBoardSize);
 				int newY = mRandom.nextInt(mBoardSize);
-				TileData temp = mGameBoard[x-1][y-1];
-				mGameBoard[x-1][y-1] = mGameBoard[newX][newY];
-				mGameBoard[newX][newY] = temp;
+				temp = mGameBoard[x-1][y-1];
+				setData(x-1, y-1, mGameBoard[newX][newY]);
+				setData(newX, newY, temp);
 			}
+		}
+		//make sure we didn't accidently leave it in a winning position
+		if(winner()) {
+			temp = mGameBoard[0][0];
+			setData(0, 0, mGameBoard[0][1]);
+			setData(0, 1, temp);
 		}
 	}
 }
