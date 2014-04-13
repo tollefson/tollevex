@@ -33,6 +33,11 @@ public class TileViewAdapter extends BaseAdapter {
         mGameBoardData = gameBoardData;
     }
 
+    public boolean areAllItemsEnabled()
+    {
+        return !winner();
+    }
+
     public int getCount() {
         return mGameBoardData.mBoardSize * mGameBoardData.mBoardSize;
     }
@@ -43,6 +48,11 @@ public class TileViewAdapter extends BaseAdapter {
 
     public long getItemId(int position) {
         return position;
+    }
+
+    public boolean isEnabled(int position)
+    {
+        return !winner();
     }
 
     public void setItem(int position, int position2) {
