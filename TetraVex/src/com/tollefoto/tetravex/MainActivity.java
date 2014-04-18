@@ -57,7 +57,7 @@ public class MainActivity extends Activity {
 		String numberofcolumns = sharedPrefs.getString(getString(R.string.pref_boardsize_key), "3");
 
 	    mGbd = new GameBoardData(Integer.parseInt(numberofcolumns));
-	    mGridview.setAdapter(new TileViewAdapter(this, mGbd));
+	    mGridview.setAdapter(new TileAdapter(this, mGbd));
 	    mGridview.setNumColumns(mGbd.mBoardSize);
 	    mNewGameButton.setVisibility(View.INVISIBLE);
 	    mNumberOfMoves = 0;
@@ -126,14 +126,14 @@ public class MainActivity extends Activity {
 
 	    mGridview.setOnItemClickListener(new OnItemClickListener() {
 	        public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+	        	TileAdapter tva = ((TileAdapter)(parent.getAdapter()));
 	        	if(mSelectedPosition != NOTSELECTEDPOSITION && mSelectedPosition != position) {
 	        		//swap positions
-	        		((TileViewAdapter)(parent.getAdapter())).setItem(position, mSelectedPosition);
+	        		tva.setItem(position, mSelectedPosition);
 	        		++mNumberOfMoves;
 	        		mMovesTextView.setText(Integer.toString(mNumberOfMoves));
 	        		mSelectedPosition = NOTSELECTEDPOSITION;
-	        		((TileViewAdapter)(parent.getAdapter())).notifyDataSetChanged();
-	        		if(((TileViewAdapter)(parent.getAdapter())).winner()) {
+	        		if(tva.winner()) {
 	        			mTimer.stop();
 	        			mNewGameButton.setVisibility(View.VISIBLE);
 	        			Toast.makeText(MainActivity.this, "You are a winner!!!!", Toast.LENGTH_LONG).show();
@@ -141,9 +141,7 @@ public class MainActivity extends Activity {
 	        	}
 	        	else {
 	        		mSelectedPosition = position;
-	        		TileView tv = (TileView)(((TileViewAdapter)(parent.getAdapter())).getItem(position));
-	        		tv.setSelected(true);
-	        		tv.requestFocusFromTouch();
+	        		v.setSelected(true);
 	        	}
 	        }
 	    });
@@ -155,7 +153,7 @@ public class MainActivity extends Activity {
 	public void onPause() {
 		super.onPause();
 		//don't set pause time if they won or newgame() will be fooled
-		if(!((TileViewAdapter)(mGridview.getAdapter())).winner()) {
+		if(!((TileAdapter)(mGridview.getAdapter())).winner()) {
 			mPauseTime = SystemClock.elapsedRealtime();
 			mTimer.stop();
 		}
@@ -165,7 +163,7 @@ public class MainActivity extends Activity {
 	public void onResume() {
 		super.onResume();
 		//don't start clock if they have already won
-		if(!((TileViewAdapter)(mGridview.getAdapter())).winner()) {
+		if(!((TileAdapter)(mGridview.getAdapter())).winner()) {
 			if(mPauseTime != 0) {
 				mTimer.setBase(mTimer.getBase() + SystemClock.elapsedRealtime() - mPauseTime);
 				mPauseTime = 0;

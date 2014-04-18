@@ -24,11 +24,11 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.GridView;
 
-public class TileViewAdapter extends BaseAdapter {
+public class TileAdapter extends BaseAdapter {
     private Context mContext;
     private GameBoardData mGameBoardData;
 
-    public TileViewAdapter(Context c, GameBoardData gameBoardData) {
+    public TileAdapter(Context c, GameBoardData gameBoardData) {
         mContext = c;
         mGameBoardData = gameBoardData;
     }
@@ -43,7 +43,7 @@ public class TileViewAdapter extends BaseAdapter {
     }
 
     public Object getItem(int position) {
-        return mTileIds[position];
+    	return mGameBoardData.getData(position);
     }
 
     public long getItemId(int position) {
@@ -56,41 +56,29 @@ public class TileViewAdapter extends BaseAdapter {
     }
 
     public void setItem(int position, int position2) {
-    	TileView tv = mTileIds[position];
-    	mTileIds[position] = mTileIds[position2];
-    	mTileIds[position2] = tv;
     	mGameBoardData.swap(position, position2);
+    	notifyDataSetChanged();
     }
 
-    // create a new ImageView for each item referenced by the Adapter
+    // create a new TileView for each item referenced by the Adapter
 	public View getView(int position, View convertView, ViewGroup parent) {
         TileView tileView;
+        TileData tileData = mGameBoardData.getData(position);
         if (convertView == null) {  // if it's not recycled, initialize some attributes
-        	TileData td = mGameBoardData.getData(position);
-            tileView = new TileView(mContext, null, td);
+            tileView = new TileView(mContext, null);
             int w = mContext.getResources().getDisplayMetrics().widthPixels;
             tileView.setLayoutParams(new GridView.LayoutParams(w/mGameBoardData.mBoardSize-5, w/mGameBoardData.mBoardSize-5));
             tileView.setPadding(0, 0, 0, 0);
-            mTileIds[position] = tileView;
-        } else {
-            tileView = mTileIds[position];
-        }
+        } else
+        	tileView = (TileView)convertView;
 
+        tileView.setData(tileData);
         return tileView;
     }
 
     //Returns true if board is in winning position
     public boolean winner() {
-    	boolean w = mGameBoardData.winner();
-    	return w;
+    	return mGameBoardData.winner();
     }
 
-    // references to our images
-   private TileView [] mTileIds = {null, null, null, null, null,
-		   null, null, null, null, null,
-		   null, null, null, null, null,
-		   null, null, null, null, null,
-		   null, null, null, null, null};
-    
-    };
-   
+};

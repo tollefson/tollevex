@@ -60,6 +60,7 @@ public class TileView extends View {
 	float mBottomRightX, mBottomRightY;
 	
 	private TileData mTileData;
+	private boolean mInitialized = false;
 
 
 	/**
@@ -75,25 +76,22 @@ public class TileView extends View {
 
 	public TileView(Context context, AttributeSet attrs) {
 		super(context, attrs);
-		init();
 		mTileData = null;
 	}
-	 public TileView(Context context, AttributeSet attrs, TileData td) {
-	        super(context, attrs);
-	        mTileData = td;
 
-	        if(mTileData != null) {
-		        mLeftColor = mTileData.mLeft;
-		        mLeftNumberLabel = Integer.toString(mLeftColor);
-		        mRightColor = mTileData.mRight;
-		        mRightNumberLabel = Integer.toString(mRightColor);
-		        mTopColor = mTileData.mTop;
-		        mTopNumberLabel = Integer.toString(mTopColor);
-		        mBottomColor = mTileData.mBottom;
-		        mBottomNumberLabel = Integer.toString(mBottomColor);
-	        }
-	        init();
-	    }
+	 public void setData(TileData tileData) {
+		 mTileData = tileData;
+		 if(mTileData != null) {
+			 mLeftColor = mTileData.mLeft;
+			 mLeftNumberLabel = Integer.toString(mLeftColor);
+			 mRightColor = mTileData.mRight;
+			 mRightNumberLabel = Integer.toString(mRightColor);
+			 mTopColor = mTileData.mTop;
+			 mTopNumberLabel = Integer.toString(mTopColor);
+			 mBottomColor = mTileData.mBottom;
+			 mBottomNumberLabel = Integer.toString(mBottomColor);
+		 }
+	 }
 
 	 public void setHot(boolean left, boolean right, boolean top, boolean bottom) {
 		 if(left)
@@ -117,6 +115,7 @@ public class TileView extends View {
 	 protected void onDraw(Canvas canvas) {
 		 super.onDraw(canvas);
 
+		 init();
 		 // Draw triangles
 		 //Left
 		 mQuadPaint.setStrokeWidth(mTrianglePathStrokeWidth);
@@ -177,6 +176,7 @@ public class TileView extends View {
 
 	 protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 		 super.onSizeChanged(w, h, oldw, oldh);
+		 init();
 		 w = (w-(mTrianglePathStrokeWidth));
 		 // Calculate location of number labels
 		 mLeftNumberX = (w / 4) - (mNumberWidth / 2);
@@ -230,21 +230,24 @@ public class TileView extends View {
 	 }
 
 	 private void init() {
-		   mNumberPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-		   mNumberPaint.setColor(mNumberColor);
-		   DisplayMetrics dm = getContext().getResources().getDisplayMetrics();
-		   mTrianglePathStrokeWidth =  3;
-		   float pixelSize = NUMBERTEXTSIZE * dm.scaledDensity; 
-		   mNumberPaint.setTextSize(pixelSize);
-		   if (mNumberHeight == 0) {
-		       mNumberHeight = mNumberPaint.getTextSize();
-		       mNumberWidth = mNumberPaint.measureText(mLeftNumberLabel);
-		   } else {
-		       mNumberPaint.setTextSize(mNumberHeight);
-		   }
-
-		   mQuadPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-		   mQuadPaint.setColor(mBorderColor);
+		 if(!mInitialized) {
+			 mNumberPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+			 mNumberPaint.setColor(mNumberColor);
+			 DisplayMetrics dm = getContext().getResources().getDisplayMetrics();
+			 mTrianglePathStrokeWidth =  3;
+			 float pixelSize = NUMBERTEXTSIZE * dm.scaledDensity; 
+			 mNumberPaint.setTextSize(pixelSize);
+			 if (mNumberHeight == 0) {
+				 mNumberHeight = mNumberPaint.getTextSize();
+				 mNumberWidth = mNumberPaint.measureText(mLeftNumberLabel);
+			 } else {
+				 mNumberPaint.setTextSize(mNumberHeight);
+			 }
+	
+			 mQuadPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+			 mQuadPaint.setColor(mBorderColor);
+		 } else
+			 mInitialized = true;
 	 }
 
 }
