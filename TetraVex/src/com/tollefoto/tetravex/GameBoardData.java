@@ -31,7 +31,7 @@ public class GameBoardData {
 
 
 	// Number of tiles in each direction
-	public int mBoardSize  = 3;
+	private int mBoardSize  = 3;
 	private TileData mGameBoard[][];
 
 	private static Random mRandom = new Random();
@@ -49,6 +49,10 @@ public class GameBoardData {
 		init();
 	}
 	
+	public int getSize() {
+		return mBoardSize;
+	}
+
 	//@returns null if x or y position are out of bounds
 	public TileData getData(int x, int y) {
 		if(x > mBoardSize || x < 1 || y > mBoardSize || y < 1)
@@ -141,6 +145,8 @@ public class GameBoardData {
 	//sets the TileData at the given location
 	private void setData(int x, int y, TileData td) {
 		mGameBoard[x][y] = td;
+		//calculate hot spots
+		//don't call this from init because not all spots will be filled.
 		return;
 	}
 

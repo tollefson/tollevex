@@ -23,8 +23,11 @@ limitations under the License.
     <string name="moves_value">0</string>
     <string name="new_game_button">New Game</string>
     <string name="action_newgame">New Game</string>
+    <string name="action_highscores">High Scores</string>
     <string name="action_settings">Settings</string>
     <string name="action_help">Help</string>
+    <string name="highscore_title">High Scores</string>
+    <string name="highscore_table_header">"Size Moves      Time"</string>
     <string name="pref_boardsize">Board Dimensions</string>
     <string name="pref_boardsize_default">3</string>
     <string name="pref_display_timer">Timer</string>

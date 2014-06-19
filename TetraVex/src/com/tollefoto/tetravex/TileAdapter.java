@@ -39,7 +39,7 @@ public class TileAdapter extends BaseAdapter {
     }
 
     public int getCount() {
-        return mGameBoardData.mBoardSize * mGameBoardData.mBoardSize;
+        return mGameBoardData.getSize() * mGameBoardData.getSize();
     }
 
     public Object getItem(int position) {
@@ -67,7 +67,8 @@ public class TileAdapter extends BaseAdapter {
         if (convertView == null) {  // if it's not recycled, initialize some attributes
             tileView = new TileView(mContext, null);
             int w = mContext.getResources().getDisplayMetrics().widthPixels;
-            tileView.setLayoutParams(new GridView.LayoutParams(w/mGameBoardData.mBoardSize-5, w/mGameBoardData.mBoardSize-5));
+            tileView.setLayoutParams(new GridView.LayoutParams(w/mGameBoardData.getSize()-5,
+            		w/mGameBoardData.getSize()-5));
             tileView.setPadding(0, 0, 0, 0);
         } else
         	tileView = (TileView)convertView;

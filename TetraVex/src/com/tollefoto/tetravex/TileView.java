@@ -39,7 +39,7 @@ public class TileView extends View {
 
 	/* Number */
 	Paint mNumberPaint;
-	float mNumberWidth, mNumberHeight;
+	float mNumberWidth = 0, mNumberHeight = 0;
 	int mNumberColor = Color.BLACK;
 	float mLeftNumberX, mLeftNumberY;
 	float mRightNumberX, mRightNumberY;
@@ -115,7 +115,6 @@ public class TileView extends View {
 	 protected void onDraw(Canvas canvas) {
 		 super.onDraw(canvas);
 
-		 init();
 		 // Draw triangles
 		 //Left
 		 mQuadPaint.setStrokeWidth(mTrianglePathStrokeWidth);
@@ -176,7 +175,8 @@ public class TileView extends View {
 
 	 protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 		 super.onSizeChanged(w, h, oldw, oldh);
-		 init();
+
+		 init(h);
 		 w = (w-(mTrianglePathStrokeWidth));
 		 // Calculate location of number labels
 		 mLeftNumberX = (w / 4) - (mNumberWidth / 2);
@@ -229,13 +229,14 @@ public class TileView extends View {
 		 mBottomTriangle.close();
 	 }
 
-	 private void init() {
+	 private void init(int height) {
 		 if(!mInitialized) {
 			 mNumberPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
 			 mNumberPaint.setColor(mNumberColor);
 			 DisplayMetrics dm = getContext().getResources().getDisplayMetrics();
 			 mTrianglePathStrokeWidth =  3;
-			 float pixelSize = NUMBERTEXTSIZE * dm.scaledDensity; 
+			 /*make the numbers as big as we can based on the height of the tile and the density of the display*/
+			 float pixelSize = (NUMBERTEXTSIZE * ((height / dm.scaledDensity)) / 77) * dm.scaledDensity; 
 			 mNumberPaint.setTextSize(pixelSize);
 			 if (mNumberHeight == 0) {
 				 mNumberHeight = mNumberPaint.getTextSize();

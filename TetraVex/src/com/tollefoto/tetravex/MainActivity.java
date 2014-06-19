@@ -41,33 +41,31 @@ public class MainActivity extends Activity {
 
 	private final static int NOTSELECTEDPOSITION = -1;
 
-	/* The selected tile. */
-	int mSelectedPosition = NOTSELECTEDPOSITION;
-	int mNumberOfMoves = 0;
+	/* Zero or one tile can be selected at a time */
+	private int mSelectedPosition = NOTSELECTEDPOSITION;
+	private int mNumberOfMoves = 0;
 	private SharedPreferences sharedPrefs;
 	private Chronometer mTimer;
+	/*Save current timer value when game is paused*/
 	private long mPauseTime = 0;
 	private SharedPreferences.OnSharedPreferenceChangeListener mSharedPreflistener;
+	private TextView mMovesTextView;
+	private TextView mMovesLabelTextView;
+	private Button mNewGameButton;
 	private GameBoardData mGbd;
 	private GridView mGridview;
-	private TextView mMovesTextView;
-	private Button mNewGameButton;
 
 	private void newGame() {
 		String numberofcolumns = sharedPrefs.getString(getString(R.string.pref_boardsize_key), "3");
 
 	    mGbd = new GameBoardData(Integer.parseInt(numberofcolumns));
 	    mGridview.setAdapter(new TileAdapter(this, mGbd));
-	    mGridview.setNumColumns(mGbd.mBoardSize);
+	    mGridview.setNumColumns(mGbd.getSize());
 	    mNewGameButton.setVisibility(View.INVISIBLE);
 	    mNumberOfMoves = 0;
 	    mMovesTextView.setText(Integer.toString(mNumberOfMoves));
-		if(mPauseTime != 0)
-			mTimer.setBase(mTimer.getBase() + SystemClock.elapsedRealtime() - mPauseTime);
-		else
-			mTimer.setBase(SystemClock.elapsedRealtime());
-		mPauseTime = 0;
-
+	    mPauseTime = 0;
+		mTimer.setBase(SystemClock.elapsedRealtime());
 	    mTimer.start();
 	}
 
@@ -80,19 +78,22 @@ public class MainActivity extends Activity {
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 		sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
  
+		/*Set the initial visibility for the timer*/
+	    mTimer = (Chronometer) findViewById(R.id.timer);
 		boolean displayTimer = sharedPrefs.getBoolean(getString(R.string.pref_display_timer_key), false);
 		if(!displayTimer)
-			findViewById(R.id.timer).setVisibility(View.INVISIBLE);
+			mTimer.setVisibility(View.INVISIBLE);
 
+		/*Set the initial visibility for the moves counter*/
 		mMovesTextView = (TextView)findViewById(R.id.movesview);
+		mMovesLabelTextView = (TextView)findViewById(R.id.label_movesview);
 		boolean displayMoves = sharedPrefs.getBoolean(getString(R.string.pref_display_moves_key), false);
 		if(!displayMoves) {
 			mMovesTextView.setVisibility(View.INVISIBLE);
-			findViewById(R.id.label_movesview).setVisibility(View.INVISIBLE);
+			mMovesLabelTextView.setVisibility(View.INVISIBLE);
 		}
 
 		mNewGameButton = (Button)findViewById(R.id.new_game_button);
-		mNewGameButton.setVisibility(View.INVISIBLE);
 		mNewGameButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
@@ -100,31 +101,35 @@ public class MainActivity extends Activity {
 			}
 		});
 
+		/* Listen for changes to the visibility of the moves counter and timer*/
 		mSharedPreflistener = new SharedPreferences.OnSharedPreferenceChangeListener() {
 			  public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
 				  if(key.equals(getString(R.string.pref_display_timer_key))) {
 					  if(prefs.getBoolean(key, false))
-						  findViewById(R.id.timer).setVisibility(View.VISIBLE);
+						  mTimer.setVisibility(View.VISIBLE);
 					  else
-						  findViewById(R.id.timer).setVisibility(View.INVISIBLE);
+						  mTimer.setVisibility(View.INVISIBLE);
 				  } else if(key.equals(getString(R.string.pref_display_moves_key))) {
 					  if(prefs.getBoolean(key, false)) {
 						  mMovesTextView.setVisibility(View.VISIBLE);
-						  findViewById(R.id.label_movesview).setVisibility(View.VISIBLE);
+						  mMovesLabelTextView.setVisibility(View.VISIBLE);
 					  }
 					  else {
 						  mMovesTextView.setVisibility(View.INVISIBLE);
-						  findViewById(R.id.label_movesview).setVisibility(View.INVISIBLE);
+						  mMovesLabelTextView.setVisibility(View.INVISIBLE);
 					  }
 				 }
 			  }
 			};
 		sharedPrefs.registerOnSharedPreferenceChangeListener(mSharedPreflistener);
 
-	    mTimer = (Chronometer) findViewById(R.id.timer);
+		/*Listen for touches to the tiles*/
 	    mGridview = (GridView) findViewById(R.id.gridview);
-
 	    mGridview.setOnItemClickListener(new OnItemClickListener() {
+	    	/*When a tile is touched we save the position and highlight the tile.
+	    	 * If a tile is already selected and another is touched then we swap the two tiles.
+	    	 * @see android.widget.AdapterView.OnItemClickListener#onItemClick(android.widget.AdapterView, android.view.View, int, long)
+	    	 */
 	        public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
 	        	TileAdapter tva = ((TileAdapter)(parent.getAdapter()));
 	        	if(mSelectedPosition != NOTSELECTEDPOSITION && mSelectedPosition != position) {
@@ -136,8 +141,15 @@ public class MainActivity extends Activity {
 	        		if(tva.winner()) {
 	        			mTimer.stop();
 	        			mNewGameButton.setVisibility(View.VISIBLE);
+	        			//save score if high score
+	        			ScoreKeeper sk = ScoreKeeper.get(parent.getContext());
+	        			sk.addScore(mGbd.getSize(), mNumberOfMoves, mTimer.getText().toString());
 	        			Toast.makeText(MainActivity.this, "You are a winner!!!!", Toast.LENGTH_LONG).show();
 	        		}
+	        	}
+	        	else if(mSelectedPosition == position) {//if we touch the same tile again we deselect it
+	        		mSelectedPosition = NOTSELECTEDPOSITION;
+	        		v.setSelected(false);
 	        	}
 	        	else {
 	        		mSelectedPosition = position;
@@ -152,11 +164,8 @@ public class MainActivity extends Activity {
 	@Override
 	public void onPause() {
 		super.onPause();
-		//don't set pause time if they won or newgame() will be fooled
-		if(!((TileAdapter)(mGridview.getAdapter())).winner()) {
-			mPauseTime = SystemClock.elapsedRealtime();
-			mTimer.stop();
-		}
+		mPauseTime = SystemClock.elapsedRealtime();
+		mTimer.stop();
 	}
 
 	@Override
@@ -185,9 +194,13 @@ public class MainActivity extends Activity {
 	    case R.id.action_newgame:
 	        newGame();
 	        return true;
+	    case R.id.action_highscores:
+	    	Intent highscoresIntent = new Intent(this, HighscoreActivity.class);
+	    	startActivity(highscoresIntent);
+	    	return true;
 	    case R.id.action_settings:
-			Intent intent = new Intent(this, SettingsActivity.class);
-			startActivity(intent);
+			Intent settingsIntent = new Intent(this, SettingsActivity.class);
+			startActivity(settingsIntent);
 	        return true;
 	    case R.id.action_help:
 	    	Dialog dialog = new Dialog(this);

@@ -4,16 +4,22 @@
         android:orderInCategory="100"
         android:showAsAction="never"
         android:title="@string/action_newgame"/>
-    
+
+    <item
+        android:id="@+id/action_highscores"
+        android:orderInCategory="110"
+        android:showAsAction="never"
+        android:title="@string/action_highscores"/>
+
     <item
         android:id="@+id/action_settings"
-        android:orderInCategory="101"
+        android:orderInCategory="120"
         android:showAsAction="never"
         android:title="@string/action_settings"/>
 
     <item
         android:id="@+id/action_help"
-        android:orderInCategory="102"
+        android:orderInCategory="130"
         android:showAsAction="never"
         android:title="@string/action_help"/>
 </menu>
