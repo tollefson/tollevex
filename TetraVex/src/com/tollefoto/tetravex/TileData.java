@@ -21,75 +21,101 @@ package com.tollefoto.tetravex;
 import java.util.Random;
 
 /*
- * This class hold the data for one tile game piece - the value for each of the four triangles.
+ * This class hold the data for one tile/square game piece - the value for each of the four triangles.
  * Any numbers not supplied in the constructor are randomly generated.  The values should be from 1 to 9.
  */
 public class TileData {
 	/*
-	 * min value is assumed by code to be one(1).
+	 * The minimum number that will appear on the tiles.
+	 */
+	public final static int MINVALUE = 1;
+	/*
+	 * The maximum number that will appear on the titles.
 	 */
 	public final static int MAXVALUE = 9;
 
-	public int mLeft;
-	public int mRight;
-	public int mTop;
-	public int mBottom;
-
-	public boolean mHotLeft = false, mHotRight = false, mHotTop = false, mHotBottom = false;
-
 	private static Random mRandom = new Random();
 
+	private int mLeft;
+	private int mRight;
+	private int mTop;
+	private int mBottom;
+
 	public TileData() {
-		mLeft = mRandom.nextInt(MAXVALUE) + 1;
-		mRight = mRandom.nextInt(MAXVALUE) + 1;
-		mTop = mRandom.nextInt(MAXVALUE) + 1;
-		mBottom = mRandom.nextInt(MAXVALUE) + 1;
-		setHot(false, false, false, false);
+		mLeft = getRandom();
+		mRight = getRandom();
+		mTop = getRandom();
+		mBottom = getRandom();
 	}
 	public TileData(int left, int right, int top, int bottom) {
-		mLeft = left;
-		mRight = right;
-		mTop = top;
-		mBottom = bottom;
-		setHot(false, false, false, false);
+		setLeft(left);
+		setRight(right);
+		setTop(top);
+		setBottom(bottom);
 	}
 	public TileData(TileData td) {
-		mLeft = td.mLeft;
-		mRight = td.mRight;
-		mTop = td.mTop;
-		mBottom = td.mBottom;
-		setHot(td.mHotLeft, td.mHotRight, mHotTop, mHotBottom);
+		setLeft(td.getLeft());
+		setRight(td.getRight());
+		setTop(td.getRight());
+		setBottom(td.getBottom());
 	}
 
+	/*
+	 * @return true if all the corresponding sides of both titles have the same number value.
+	 */
 	public boolean equals(TileData td) {
-		return mLeft == td.mLeft && mRight == td.mRight && mTop == td.mTop && mBottom == td.mBottom;
+		return getLeft() == td.getLeft() && getRight() == td.getRight() && getTop() == td.getTop() && getBottom() == td.getBottom();
 	}
-	
+
 	public static TileData createWithLeft(TileData left, TileData top) {
 		TileData td;
 		if(left == null) {
 			if(top == null)
 				td = new TileData(getRandom(), getRandom(), getRandom(), getRandom());
 			else
-				td = new TileData(getRandom(), getRandom(), top.mBottom, getRandom());
+				td = new TileData(getRandom(), getRandom(), top.getBottom(), getRandom());
 		}
 		else {
 			if( top == null)
-				td = new TileData(left.mRight, getRandom(), getRandom(), getRandom());
+				td = new TileData(left.getRight(), getRandom(), getRandom(), getRandom());
 			else
-				td = new TileData(left.mRight, getRandom(), top.mBottom, getRandom());
+				td = new TileData(left.getRight(), getRandom(), top.getBottom(), getRandom());
 		}
 		return td;
 	}
 
-	public void setHot(boolean left, boolean right, boolean top, boolean bottom) {
-		mHotLeft = left;
-		mHotRight = right;
-		mHotTop = top;
-		mHotBottom = bottom;
-	}
 
+	public int getLeft() {
+		return mLeft;
+	}
+	public void setLeft(int left) {
+		mLeft = left;
+	}
+	public int getRight() {
+		return mRight;
+	}
+	public void setRight(int right) {
+		mRight = right;
+	}
+	public int getTop() {
+		return mTop;
+	}
+	public void setTop(int top) {
+		mTop = top;
+	}
+	public int getBottom() {
+		return mBottom;
+	}
+	public void setBottom(int bottom) {
+		mBottom = bottom;
+	}
+	
+	/*
+	 * @return random number between MINVALUE and MAXVALUE.
+	 * @see MINVALUE
+	 * @see MAXVALUE
+	 */
 	private static int getRandom() {
-		return mRandom.nextInt(MAXVALUE) + 1;
+		return mRandom.nextInt(MAXVALUE) + MINVALUE;
 	}
 }

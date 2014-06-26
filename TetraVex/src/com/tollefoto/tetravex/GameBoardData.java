@@ -102,6 +102,9 @@ public class GameBoardData {
 		}
 	}
 
+	/*
+	 * @return true if game board is in winning position
+	 */
 	public boolean winner() {
 		/*
 		 * We don't need to compare when we get to the last tile in each row because
@@ -111,12 +114,12 @@ public class GameBoardData {
 		for (int x = 1; x <= mBoardSize; ++x) {
 			for (int y = 1; y <= mBoardSize; ++y) {
 				if(x == 1) { //for top row just check the tile to the right
-					if(y!= mBoardSize && mGameBoard[x-1][y-1].mRight != mGameBoard[x-1][y].mLeft)
+					if(y!= mBoardSize && mGameBoard[x-1][y-1].getRight() != mGameBoard[x-1][y].getLeft())
 						return false;
 				} else { //check the tile to the right and above on other rows
-					if(( y!= mBoardSize && mGameBoard[x-1][y-1].mRight != mGameBoard[x-1][y].mLeft))
+					if(( y!= mBoardSize && mGameBoard[x-1][y-1].getRight() != mGameBoard[x-1][y].getLeft()))
 						return false;
-					if(mGameBoard[x-1][y-1].mTop != mGameBoard[x-2][y-1].mBottom)
+					if(mGameBoard[x-1][y-1].getTop() != mGameBoard[x-2][y-1].getBottom())
 						return false;
 				}
 			}
@@ -127,16 +130,19 @@ public class GameBoardData {
 	//initialize the board with playable game values
 	private void init() {
 		mGameBoard = new TileData[mBoardSize][mBoardSize];
-
 		TileData previousLeftTD = null;
 		TileData previousTopTD = null;
+
 		for (int x = 1; x <= mBoardSize; ++x) {
 			for (int y = 1; y <= mBoardSize; ++y) {
-				if(x > 1)
+				if(x > 1) //if we are not in the first row then get the tile above us
 					previousTopTD = mGameBoard[x-2][y-1];
 				TileData td = TileData.createWithLeft(previousLeftTD, previousTopTD);
 				setData(x-1, y-1, td);
-				previousLeftTD = td;
+				if(y == mBoardSize)
+					previousLeftTD = null;
+				else
+					previousLeftTD = td;
 			}
 		}
 		scramble();
@@ -145,8 +151,6 @@ public class GameBoardData {
 	//sets the TileData at the given location
 	private void setData(int x, int y, TileData td) {
 		mGameBoard[x][y] = td;
-		//calculate hot spots
-		//don't call this from init because not all spots will be filled.
 		return;
 	}
 

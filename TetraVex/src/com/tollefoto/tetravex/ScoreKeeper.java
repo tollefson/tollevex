@@ -24,7 +24,6 @@ import java.util.Iterator;
 import java.util.UUID;
 
 import android.content.Context;
-import android.util.Log;
 
 /**
  * 
@@ -33,14 +32,17 @@ import android.util.Log;
  */
 public class ScoreKeeper {
 	private static final String FILENAME = "highscores.json";
-	private static final String TAG = "ScoreKeeper";
+	/*
+	 * The maximum number of scores kept per board size.
+	 */
 	private static final int    MAXNUMBEROFSCORES = 10;
 
 	private ArrayList<Highscore> mHighscores;
 	private HighscoreJSONSerializer mSerializer;
 	private static ScoreKeeper sScoreKeeper;
 	private Context mAppContext;
-	
+
+
 	private ScoreKeeper(Context appContext) {
 		mAppContext = appContext;
 		mSerializer = new HighscoreJSONSerializer(mAppContext, FILENAME);
@@ -49,7 +51,6 @@ public class ScoreKeeper {
 			mHighscores = mSerializer.loadHighscores();
 		} catch (Exception e) {
 			mHighscores = new ArrayList<Highscore>();
-			Log.e(TAG, "Error laoding high scores", e);
 		}
 	}
 	
@@ -83,10 +84,8 @@ public class ScoreKeeper {
 	public boolean saveHighscores() {
 		try {
 			mSerializer.saveHighscores(mHighscores);
-			Log.d(TAG, "high scores saved");
 			return true;
 		} catch (Exception e) {
-			Log.e(TAG, "Error in saving high scores: ", e);
 			return false;
 		}
 	}

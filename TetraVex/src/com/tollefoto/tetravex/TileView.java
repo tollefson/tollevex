@@ -34,44 +34,35 @@ import android.view.View;
  */
 public class TileView extends View {
 
-	final static int NUMBERTEXTSIZE = 18;
-	final static int HOTFACTOR = 3;
+	/* Map numbers, 1 to 9, to unique color */
+	private final static int NUMBERCOLORMAP[] = {Color.BLACK, Color.rgb(11,124,196), Color.rgb(29,217,224), Color.rgb(186,186,186), Color.rgb(51,213,59),
+			Color.rgb(251,23,68), Color.rgb(205,43,207), Color.rgb(86,150,28), Color.rgb(222, 224, 29), Color.rgb(251,121,6)};
+	private final static int NUMBERTEXTSIZE = 18;
 
 	/* Number */
-	Paint mNumberPaint;
-	float mNumberWidth = 0, mNumberHeight = 0;
-	int mNumberColor = Color.BLACK;
-	float mLeftNumberX, mLeftNumberY;
-	float mRightNumberX, mRightNumberY;
-	float mTopNumberX, mTopNumberY;
-	float mBottomNumberX, mBottomNumberY;
-	String mLeftNumberLabel, mRightNumberLabel, mTopNumberLabel, mBottomNumberLabel;
+	private Paint mNumberPaint;
+	private float mNumberWidth = 0, mNumberHeight = 0;
+	private int mNumberColor = Color.BLACK;
+	private float mLeftNumberX, mLeftNumberY;
+	private float mRightNumberX, mRightNumberY;
+	private float mTopNumberX, mTopNumberY;
+	private float mBottomNumberX, mBottomNumberY;
+	private String mLeftNumberLabel, mRightNumberLabel, mTopNumberLabel, mBottomNumberLabel;
 
 	/* Quadrant */
-	Paint mQuadPaint;
-	int mBorderColor = Color.DKGRAY;
-	int mLeftColor, mRightColor, mTopColor, mBottomColor;
-	float mCenterX, mCenterY;
-	int mTrianglePathStrokeWidth = 3;
-	Path mLeftTriangle, mRightTriangle, mTopTriangle, mBottomTriangle;
-	float mTopLeftX, mTopLeftY;
-	float mBottomLeftX, mBottomLeftY;
-	float mTopRightX, mTopRightY;
-	float mBottomRightX, mBottomRightY;
+	private Paint mQuadPaint;
+	private int mBorderColor = Color.DKGRAY;
+	private int mLeftColor, mRightColor, mTopColor, mBottomColor;
+	private float mCenterX, mCenterY;
+	private int mTrianglePathStrokeWidth = 3;
+	private Path mLeftTriangle, mRightTriangle, mTopTriangle, mBottomTriangle;
+	private float mTopLeftX, mTopLeftY;
+	private float mBottomLeftX, mBottomLeftY;
+	private float mTopRightX, mTopRightY;
+	private float mBottomRightX, mBottomRightY;
 	
 	private TileData mTileData;
 	private boolean mInitialized = false;
-
-
-	/**
-	 * A triangle that is hot means the outside portion of a hot triangle will be drawn with a thicker line.
-	 */
-	int mLeftHot, mRightHot, mTopHot, mBottomHot = 0;
-	
-
-	/* Map numbers, 1 to 9, to unique color */
-	int mNumberColorMap[] = {Color.BLACK, Color.rgb(11,124,196), Color.rgb(29,217,224), Color.rgb(186,186,186), Color.rgb(51,213,59),
-			Color.rgb(251,23,68), Color.rgb(205,43,207), Color.rgb(86,150,28), Color.rgb(222, 224, 29), Color.rgb(251,121,6)};
 
 
 	public TileView(Context context, AttributeSet attrs) {
@@ -82,34 +73,15 @@ public class TileView extends View {
 	 public void setData(TileData tileData) {
 		 mTileData = tileData;
 		 if(mTileData != null) {
-			 mLeftColor = mTileData.mLeft;
+			 mLeftColor = mTileData.getLeft();
 			 mLeftNumberLabel = Integer.toString(mLeftColor);
-			 mRightColor = mTileData.mRight;
+			 mRightColor = mTileData.getRight();
 			 mRightNumberLabel = Integer.toString(mRightColor);
-			 mTopColor = mTileData.mTop;
+			 mTopColor = mTileData.getTop();
 			 mTopNumberLabel = Integer.toString(mTopColor);
-			 mBottomColor = mTileData.mBottom;
+			 mBottomColor = mTileData.getBottom();
 			 mBottomNumberLabel = Integer.toString(mBottomColor);
 		 }
-	 }
-
-	 public void setHot(boolean left, boolean right, boolean top, boolean bottom) {
-		 if(left)
-			 mLeftHot = HOTFACTOR;
-		 else
-			 mLeftHot = 0;
-		 if(right)
-			 mRightHot = HOTFACTOR;
-		 else
-			 mRightHot = 0;
-		 if(top)
-			 mTopHot = HOTFACTOR;
-		 else
-			 mTopHot = 0;
-		 if(bottom)
-			 mBottomHot = HOTFACTOR;
-		 else
-			 mBottomHot = 0;
 	 }
 
 	 protected void onDraw(Canvas canvas) {
@@ -118,19 +90,19 @@ public class TileView extends View {
 		 // Draw triangles
 		 //Left
 		 mQuadPaint.setStrokeWidth(mTrianglePathStrokeWidth);
-		 mQuadPaint.setColor(mNumberColorMap[mLeftColor]);
+		 mQuadPaint.setColor(NUMBERCOLORMAP[mLeftColor]);
 		 canvas.drawPath(mLeftTriangle, mQuadPaint);
 
 		 //Right
-		 mQuadPaint.setColor(mNumberColorMap[mRightColor]);
+		 mQuadPaint.setColor(NUMBERCOLORMAP[mRightColor]);
 		 canvas.drawPath(mRightTriangle, mQuadPaint);
 
 		 //Top
-		 mQuadPaint.setColor(mNumberColorMap[mTopColor]);
+		 mQuadPaint.setColor(NUMBERCOLORMAP[mTopColor]);
 		 canvas.drawPath(mTopTriangle, mQuadPaint);
 
 		 //Bottom
-		 mQuadPaint.setColor(mNumberColorMap[mBottomColor]);
+		 mQuadPaint.setColor(NUMBERCOLORMAP[mBottomColor]);
 		 canvas.drawPath(mBottomTriangle, mQuadPaint);
 
 		 if(isSelected())
@@ -140,28 +112,28 @@ public class TileView extends View {
 		 // Left triangle
 		 canvas.drawLine(mCenterX, mCenterY, mTopLeftX, mTopLeftY, mQuadPaint);
 		 canvas.drawLine(mCenterX, mCenterY, mBottomLeftX, mBottomLeftY, mQuadPaint);
-		 mQuadPaint.setStrokeWidth(mTrianglePathStrokeWidth + (mTileData.mHotLeft ? HOTFACTOR : 0));
+		 mQuadPaint.setStrokeWidth(mTrianglePathStrokeWidth);
 		 canvas.drawLine(mTopLeftX, mTopLeftY, mBottomLeftX, mBottomLeftY, mQuadPaint);
 		 mQuadPaint.setStrokeWidth(mTrianglePathStrokeWidth);
 
 		 // Right triangle
 		 canvas.drawLine(mCenterX, mCenterY, mTopRightX, mTopRightY, mQuadPaint);
 		 canvas.drawLine(mCenterX, mCenterY, mBottomRightX, mBottomRightY, mQuadPaint);
-		 mQuadPaint.setStrokeWidth(mTrianglePathStrokeWidth + (mTileData.mHotRight ? HOTFACTOR : 0));
+		 mQuadPaint.setStrokeWidth(mTrianglePathStrokeWidth);
 		 canvas.drawLine(mBottomRightX, mBottomRightY, mTopRightX, mTopRightY, mQuadPaint);
 		 mQuadPaint.setStrokeWidth(mTrianglePathStrokeWidth);
 		 
 		 // Top triangle
 		 canvas.drawLine(mCenterX, mCenterY, mTopLeftX, mTopLeftY, mQuadPaint);
 		 canvas.drawLine(mCenterX, mCenterY, mBottomRightX, mBottomRightY, mQuadPaint);
-		 mQuadPaint.setStrokeWidth(mTrianglePathStrokeWidth + (mTileData.mHotTop ? HOTFACTOR : 0));
+		 mQuadPaint.setStrokeWidth(mTrianglePathStrokeWidth);
 		 canvas.drawLine(mTopLeftX, mTopLeftY, mTopRightX, mTopRightY, mQuadPaint);
 		 mQuadPaint.setStrokeWidth(mTrianglePathStrokeWidth);
 		 
 		 // Bottom triangle
 		 canvas.drawLine(mCenterX, mCenterY, mBottomRightX, mBottomRightY, mQuadPaint);
 		 canvas.drawLine(mCenterX, mCenterY, mBottomLeftX, mBottomLeftY, mQuadPaint);
-		 mQuadPaint.setStrokeWidth(mTrianglePathStrokeWidth + (mTileData.mHotBottom ? HOTFACTOR : 0));
+		 mQuadPaint.setStrokeWidth(mTrianglePathStrokeWidth);
 		 canvas.drawLine(mBottomLeftX, mBottomLeftY, mBottomRightX, mBottomRightY, mQuadPaint);
 		 mQuadPaint.setStrokeWidth(mTrianglePathStrokeWidth);
 

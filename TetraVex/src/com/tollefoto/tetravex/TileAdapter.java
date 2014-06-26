@@ -33,11 +33,6 @@ public class TileAdapter extends BaseAdapter {
         mGameBoardData = gameBoardData;
     }
 
-    public boolean areAllItemsEnabled()
-    {
-        return !winner();
-    }
-
     public int getCount() {
         return mGameBoardData.getSize() * mGameBoardData.getSize();
     }
@@ -50,8 +45,14 @@ public class TileAdapter extends BaseAdapter {
         return position;
     }
 
-    public boolean isEnabled(int position)
-    {
+    /*
+     * The tiles enabled for selection until the game is won.
+     * @see android.widget.BaseAdapter#isEnabled(int)
+     */
+    public boolean isEnabled(int position) {
+        return !winner();
+    }
+    public boolean areAllItemsEnabled() {
         return !winner();
     }
 
@@ -77,7 +78,10 @@ public class TileAdapter extends BaseAdapter {
         return tileView;
     }
 
-    //Returns true if board is in winning position
+	/*
+	 * @return true if board is in winning position
+	 * @see GameBoardData
+	 */
     public boolean winner() {
     	return mGameBoardData.winner();
     }

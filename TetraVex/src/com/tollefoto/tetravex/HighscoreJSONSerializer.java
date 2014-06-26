@@ -42,43 +42,50 @@ public class HighscoreJSONSerializer {
 		mFilename = filename;
 	}
 
+	public Context getContext() {
+		return mContext;
+	}
+
+	public String getFilename() {
+		return mFilename;
+	}
+
 	public ArrayList<Highscore> loadHighscores() throws IOException, JSONException {
 		ArrayList<Highscore> highscores = new ArrayList<Highscore>();
-		BufferedReader reader = null;
+		BufferedReader buffReader = null;
 		try {
-			InputStream input = mContext.openFileInput(mFilename);
-			reader = new BufferedReader(new InputStreamReader(input));
+			InputStream input = getContext().openFileInput(getFilename());
+			buffReader = new BufferedReader(new InputStreamReader(input));
 			StringBuilder jsonString = new StringBuilder();
 			String line = null;
-			while((line = reader.readLine())!= null) {
+			while((line = buffReader.readLine())!= null) {
 				jsonString.append(line);
 			}
-			//parse
-			JSONArray array = (JSONArray) new JSONTokener(jsonString.toString())
-				.nextValue();
-			for(int i = 0; i < array.length(); i++)
-				highscores.add(new Highscore(array.getJSONObject(i)));
+
+			JSONArray jarray = (JSONArray) new JSONTokener(jsonString.toString()).nextValue();
+			for(int i = 0; i < jarray.length(); i++)
+				highscores.add(new Highscore(jarray.getJSONObject(i)));
 
 		} catch (FileNotFoundException e) {
-			//happens when starting the first time
+			//if the first time
 		} finally {
-			if(reader!=null)
-				reader.close();
+			if(buffReader!=null)
+				buffReader.close();
 		}
 		return highscores;
 	}
+
 	public void saveHighscores(ArrayList<Highscore> highscores)
 		throws JSONException, IOException {
-		JSONArray array = new JSONArray();
+		JSONArray jarray = new JSONArray();
 		for(Highscore hs : highscores)
-			array.put(hs.toJSON());
+			jarray.put(hs.toJSON());
 		
 		Writer writer = null;
 		try {
-			OutputStream out = mContext
-					.openFileOutput(mFilename, Context.MODE_PRIVATE);
-			writer = new OutputStreamWriter(out);
-			writer.write(array.toString());
+			OutputStream outStream = getContext().openFileOutput(getFilename(), Context.MODE_PRIVATE);
+			writer = new OutputStreamWriter(outStream);
+			writer.write(jarray.toString());
 		} finally {
 			if(writer != null)
 				writer.close();

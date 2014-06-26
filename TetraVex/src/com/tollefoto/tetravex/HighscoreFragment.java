@@ -30,6 +30,10 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
+/*
+ * The current implementation shows all the high scores sorted by board size then
+ * by moves and finally by the time to complete value.  It is a single scrollable list.
+ */
 public class HighscoreFragment extends ListFragment {
 	private ListView mListView;
 	ArrayAdapter<Highscore> mAdapter;
@@ -67,12 +71,19 @@ public class HighscoreFragment extends ListFragment {
 		return v;
 	}
 
+	/*
+	 * This class is used to feed list item TextView objects to the list.
+	 */
 	private class ScoreAdapter extends ArrayAdapter<Highscore> {
 		public ScoreAdapter(ArrayList<Highscore> highscores) {
 			super(getActivity(), 0, highscores);
 		}
 
 		@Override
+		/*
+		 * The list items are never selectable only for viewing and scrolling.
+		 * @see android.widget.BaseAdapter#isEnabled(int)
+		 */
 	    public boolean isEnabled(int position) {
 	        return false;
 	    }
@@ -85,11 +96,7 @@ public class HighscoreFragment extends ListFragment {
 			}
 			Highscore hs = getItem(position);
 			TextView scoreTextView = (TextView)convertView.findViewById(R.id.highscore_list_itemTextView);
-			String scoreLine = "";
-			if(position < 9)
-				scoreLine += " ";//so score counts take the same number of characters
-			scoreLine += /*Integer.toString(position+1) + "." +*/ hs.toString();
-			scoreTextView.setText(scoreLine);
+			scoreTextView.setText(hs.toString());
 			return convertView;
 		}
 	}
