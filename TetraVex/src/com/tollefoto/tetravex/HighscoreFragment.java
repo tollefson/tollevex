@@ -81,7 +81,7 @@ public class HighscoreFragment extends ListFragment {
 
 		@Override
 		/*
-		 * The list items are never selectable only for viewing and scrolling.
+		 * The list items are never select-able only for viewing and scrolling.
 		 * @see android.widget.BaseAdapter#isEnabled(int)
 		 */
 	    public boolean isEnabled(int position) {
