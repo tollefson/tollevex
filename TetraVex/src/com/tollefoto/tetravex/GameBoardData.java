@@ -1,7 +1,7 @@
 /*
 tollevex - a tetravex like game
 
-Copyright 2014 Jon Tollefson <jon@tollefoto.com>
+Copyright 2014,2015 Jon Tollefson <jon@tollefoto.com>
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -28,40 +28,68 @@ public class GameBoardData {
 	public final static int MAXBOARDSIZE = 5;
 	public final static int MINBOARDSIZE = 2;
 	public final static int DEFAULTBOARDSIZE = 3;
-
+    final static String ROWSEPARATOR = ";";
+    final static String TILESEPARATOR = ":";
 
 	// Number of tiles in each direction
 	private int mBoardSize  = 3;
 	private TileData mGameBoard[][];
-
 	private static Random mRandom = new Random();
 
-	public GameBoardData() {
-		mBoardSize = DEFAULTBOARDSIZE;
-		init();
-	}
 
-	public GameBoardData(int boardSize) {
+	public GameBoardData(String gameState, int boardSize) {
 		if(boardSize < MINBOARDSIZE || boardSize > MAXBOARDSIZE)
 			mBoardSize = DEFAULTBOARDSIZE;
 		else
 			mBoardSize = boardSize;
-		init();
+
+        mGameBoard = new TileData[mBoardSize][mBoardSize];
+        if(gameState!=null && gameState.length() > 0) {
+            loadGameState(gameState);
+        } else
+    		init();
 	}
-	
+
+    //@returns game board as a string of numbers with each row
+    //  split by SEPARATOR.
+    public String saveGameState() {
+        String state = "";
+        String row = "";
+
+        for (int x = 1; x <= mBoardSize; ++x) {
+            for (int y = 1; y <= mBoardSize; ++y) {
+                row += mGameBoard[x-1][y-1].tileState();
+                if(y < mBoardSize)
+                    row += TILESEPARATOR;
+            }
+            state += row;
+            row = "";
+            if(x < mBoardSize)
+                state += ROWSEPARATOR;
+        }
+        return state;
+    }
+
+    public void loadGameState(String state) {
+        String delimitors = ROWSEPARATOR;
+        String[] rowTokens = state.split(delimitors);
+        for (int x = 1; x <= mBoardSize; ++x) {
+            delimitors = TILESEPARATOR;
+            String[] tileData = rowTokens[x - 1].split(delimitors);
+            for (int y = 1; y <= mBoardSize; ++y) {
+                TileData td = new TileData(tileData[y-1]);
+                setData(x - 1, y - 1, td);
+            }
+        }
+    }
+
 	public int getSize() {
 		return mBoardSize;
 	}
 
-	//@returns null if x or y position are out of bounds
-	public TileData getData(int x, int y) {
-		if(x > mBoardSize || x < 1 || y > mBoardSize || y < 1)
-			return null;
-		return mGameBoard[x][y];
-	}
 	public TileData getData(int position) {
 		int pos = 0;
-		int x = 1, y = 1;
+		int x, y;
 		if(position < 0 || position > (mBoardSize * mBoardSize) - 1)
 			return null;
 		for (x = 1; x <= mBoardSize; ++x) {
@@ -76,7 +104,7 @@ public class GameBoardData {
 
 	public void swap(int position1, int position2) {
 		int pos = 0;
-		int x = 1, y = 1;
+		int x, y;
 		TileData pos1Data = null;
 		if(position1 < 0 || position1 > (mBoardSize * mBoardSize) - 1)
 			return;
@@ -102,7 +130,7 @@ public class GameBoardData {
 		}
 	}
 
-	/*
+    /*
 	 * @return true if game board is in winning position
 	 */
 	public boolean winner() {
@@ -127,9 +155,9 @@ public class GameBoardData {
 		return true; //all edges matched
 	}
 
-	//initialize the board with playable game values
+
+    //initialize the board with playable game values
 	private void init() {
-		mGameBoard = new TileData[mBoardSize][mBoardSize];
 		TileData previousLeftTD = null;
 		TileData previousTopTD = null;
 
@@ -145,13 +173,12 @@ public class GameBoardData {
 					previousLeftTD = td;
 			}
 		}
-		scramble();
+               scramble();
 	}
 	
 	//sets the TileData at the given location
 	private void setData(int x, int y, TileData td) {
 		mGameBoard[x][y] = td;
-		return;
 	}
 
 	//randomize the playing board for more fun

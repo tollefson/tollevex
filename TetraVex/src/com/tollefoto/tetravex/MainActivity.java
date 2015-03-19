@@ -1,7 +1,7 @@
 /*
 tollevex - a tetravex like game
 
-Copyright 2014 Jon Tollefson <jon@tollefoto.com>
+Copyright 2014,2015 Jon Tollefson <jon@tollefoto.com>
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,17 +18,21 @@ limitations under the License.
 
 package com.tollefoto.tetravex;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
@@ -40,6 +44,10 @@ import android.widget.Toast;
 public class MainActivity extends Activity {
 
 	private final static int NOTSELECTEDPOSITION = -1;
+    static final String STATE_NUMBEROFCOLUMNS = "numberOfColumns";
+    static final String STATE_GAMEBOARD = "gameBoard";
+    static final String STATE_MOVES = "moveCount";
+    static final String STATE_CURRENTTIME = "currentTime";
 
 	/* Zero or one tile can be selected at a time */
 	private int mSelectedPosition = NOTSELECTEDPOSITION;
@@ -48,36 +56,81 @@ public class MainActivity extends Activity {
 	private Chronometer mTimer;
 	/*Save current timer value when game is paused*/
 	private long mPauseTime = 0;
-	private SharedPreferences.OnSharedPreferenceChangeListener mSharedPreflistener;
 	private TextView mMovesTextView;
 	private TextView mMovesLabelTextView;
 	private Button mNewGameButton;
 	private GameBoardData mGbd;
 	private GridView mGridview;
 
-	private void newGame() {
-		String numberofcolumns = sharedPrefs.getString(getString(R.string.pref_boardsize_key), "3");
+    private void newGame(Bundle savedInstanceState) {
+		int numberOfColumns;
+        String gameState = "";
+        int stoppedTime = 0;
 
-	    mGbd = new GameBoardData(Integer.parseInt(numberofcolumns));
+        if (savedInstanceState != null) {
+            // Restore state members from saved instance
+            numberOfColumns = savedInstanceState.getInt(STATE_NUMBEROFCOLUMNS);
+            gameState = savedInstanceState.getString(STATE_GAMEBOARD);
+            mNumberOfMoves = savedInstanceState.getInt(STATE_MOVES);
+            String currentTime = savedInstanceState.getString(STATE_CURRENTTIME);
+            String timeSplits[] = currentTime.split(":");
+            if (timeSplits.length == 2) {
+                stoppedTime = Integer.parseInt(timeSplits[0]) * 60 * 1000
+                        + Integer.parseInt(timeSplits[1]) * 1000;
+            } else if (timeSplits.length == 3) {
+                stoppedTime = Integer.parseInt(timeSplits[0]) * 60 * 60 * 1000
+                        + Integer.parseInt(timeSplits[1]) * 60 * 1000
+                        + Integer.parseInt(timeSplits[2]) * 1000;
+            }
+        }
+        else {
+            numberOfColumns = Integer.parseInt(sharedPrefs.getString(getString(R.string.pref_boardsize_key), "3"));
+            mNumberOfMoves = 0;
+        }
+
+        mTimer.setBase(SystemClock.elapsedRealtime() - stoppedTime);
+	    mGbd = new GameBoardData(gameState, numberOfColumns);
 	    mGridview.setAdapter(new TileAdapter(this, mGbd));
 	    mGridview.setNumColumns(mGbd.getSize());
-	    mNewGameButton.setVisibility(View.INVISIBLE);
-	    mNumberOfMoves = 0;
 	    mMovesTextView.setText(Integer.toString(mNumberOfMoves));
-	    mPauseTime = 0;
-		mTimer.setBase(SystemClock.elapsedRealtime());
-	    mTimer.start();
+        if(((TileAdapter)(mGridview.getAdapter())).winner())
+            mNewGameButton.setVisibility(View.VISIBLE);
+        else {
+            mNewGameButton.setVisibility(View.INVISIBLE);
+            mTimer.start();
+        }
 	}
 
-	@Override
+    @Override
 	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_main);
-		setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        super.onCreate(savedInstanceState);
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            if (Build.VERSION.SDK_INT < 16) {
+                getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                        WindowManager.LayoutParams.FLAG_FULLSCREEN);
+            //Remove title bar
+            this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+            }
+            else {
+                View decorView = getWindow().getDecorView();
+                // Hide the status bar.
+                int uiOptions = View.SYSTEM_UI_FLAG_FULLSCREEN;
+                decorView.setSystemUiVisibility(uiOptions);
+                // Remember that you should never show the action bar if the
+                // status bar is hidden, so hide that too if necessary.
+                ActionBar actionBar = getActionBar();
+                if (actionBar != null) {
+                    actionBar.hide();
+                }
+            }
+        }
+
+        setContentView(R.layout.activity_main);
 
 		PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
 		sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
- 
+        SharedPreferences.OnSharedPreferenceChangeListener sharedPreflistener;
+
 		/*Set the initial visibility for the timer*/
 	    mTimer = (Chronometer) findViewById(R.id.timer);
 		boolean displayTimer = sharedPrefs.getBoolean(getString(R.string.pref_display_timer_key), false);
@@ -97,12 +150,12 @@ public class MainActivity extends Activity {
 		mNewGameButton.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				newGame();
+				newGame(null);
 			}
 		});
 
 		/* Listen for changes to the visibility of the moves counter and timer*/
-		mSharedPreflistener = new SharedPreferences.OnSharedPreferenceChangeListener() {
+		sharedPreflistener = new SharedPreferences.OnSharedPreferenceChangeListener() {
 			  public void onSharedPreferenceChanged(SharedPreferences prefs, String key) {
 				  if(key.equals(getString(R.string.pref_display_timer_key))) {
 					  if(prefs.getBoolean(key, false))
@@ -121,7 +174,7 @@ public class MainActivity extends Activity {
 				 }
 			  }
 			};
-		sharedPrefs.registerOnSharedPreferenceChangeListener(mSharedPreflistener);
+		sharedPrefs.registerOnSharedPreferenceChangeListener(sharedPreflistener);
 
 		/*Listen for touches to the tiles*/
 	    mGridview = (GridView) findViewById(R.id.gridview);
@@ -140,7 +193,7 @@ public class MainActivity extends Activity {
 	        		mSelectedPosition = NOTSELECTEDPOSITION;
 	        		if(tva.winner()) {
 	        			mTimer.stop();
-	        			mNewGameButton.setVisibility(View.VISIBLE);
+                        mNewGameButton.setVisibility(View.VISIBLE);
 	        			//save score if high score
 	        			ScoreKeeper sk = ScoreKeeper.get(parent.getContext());
 	        			sk.addScore(mGbd.getSize(), mNumberOfMoves, mTimer.getText().toString());
@@ -158,14 +211,7 @@ public class MainActivity extends Activity {
 	        }
 	    });
 
-	    newGame();
-	}
-
-	@Override
-	public void onPause() {
-		super.onPause();
-		mPauseTime = SystemClock.elapsedRealtime();
-		mTimer.stop();
+   	    newGame(savedInstanceState);
 	}
 
 	@Override
@@ -177,9 +223,23 @@ public class MainActivity extends Activity {
 				mTimer.setBase(mTimer.getBase() + SystemClock.elapsedRealtime() - mPauseTime);
 				mPauseTime = 0;
 			}
-				mTimer.start();
+		    mTimer.start();
 		}
 	}
+
+    @Override
+    protected void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+        // Save the user's current game state
+        mPauseTime = SystemClock.elapsedRealtime();
+        mTimer.stop();
+        savedInstanceState.putString(STATE_CURRENTTIME, mTimer.getText().toString());
+        savedInstanceState.putInt(STATE_MOVES, mNumberOfMoves);
+        savedInstanceState.putInt(STATE_NUMBEROFCOLUMNS, mGbd.getSize());
+        savedInstanceState.putString(STATE_GAMEBOARD, mGbd.saveGameState());
+        // Always call the superclass so it can save the view hierarchy state
+        super.onSaveInstanceState(savedInstanceState);
+    }
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -192,7 +252,7 @@ public class MainActivity extends Activity {
 	public boolean onOptionsItemSelected(MenuItem item) {
 	    switch (item.getItemId()) {
 	    case R.id.action_newgame:
-	        newGame();
+	        newGame(null);
 	        return true;
 	    case R.id.action_highscores:
 	    	Intent highscoresIntent = new Intent(this, HighscoreActivity.class);

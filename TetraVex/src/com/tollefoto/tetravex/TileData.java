@@ -1,7 +1,7 @@
 /*
 tollevex - a tetravex like game
 
-Copyright 2014 Jon Tollefson <jon@tollefoto.com>
+Copyright 2014,2015 Jon Tollefson <jon@tollefoto.com>
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -34,6 +34,8 @@ public class TileData {
 	 */
 	public final static int MAXVALUE = 9;
 
+    final static String DATASEPARATOR = ",";
+
 	private static Random mRandom = new Random();
 
 	private int mLeft;
@@ -41,30 +43,20 @@ public class TileData {
 	private int mTop;
 	private int mBottom;
 
-	public TileData() {
-		mLeft = getRandom();
-		mRight = getRandom();
-		mTop = getRandom();
-		mBottom = getRandom();
+	public TileData(String state) {
+        String delimitors = DATASEPARATOR;
+        String[] tokens = state.split(delimitors);
+
+        mLeft = Integer.parseInt(tokens[0]);
+		mRight = Integer.parseInt(tokens[1]);
+		mTop = Integer.parseInt(tokens[2]);
+		mBottom = Integer.parseInt(tokens[3]);
 	}
 	public TileData(int left, int right, int top, int bottom) {
 		setLeft(left);
 		setRight(right);
 		setTop(top);
 		setBottom(bottom);
-	}
-	public TileData(TileData td) {
-		setLeft(td.getLeft());
-		setRight(td.getRight());
-		setTop(td.getRight());
-		setBottom(td.getBottom());
-	}
-
-	/*
-	 * @return true if all the corresponding sides of both titles have the same number value.
-	 */
-	public boolean equals(TileData td) {
-		return getLeft() == td.getLeft() && getRight() == td.getRight() && getTop() == td.getTop() && getBottom() == td.getBottom();
 	}
 
 	public static TileData createWithLeft(TileData left, TileData top) {
@@ -79,7 +71,7 @@ public class TileData {
 			if( top == null)
 				td = new TileData(left.getRight(), getRandom(), getRandom(), getRandom());
 			else
-				td = new TileData(left.getRight(), getRandom(), top.getBottom(), getRandom());
+                td = new TileData(left.getRight(), getRandom(), top.getBottom(), getRandom());
 		}
 		return td;
 	}
@@ -109,7 +101,12 @@ public class TileData {
 	public void setBottom(int bottom) {
 		mBottom = bottom;
 	}
-	
+	public String tileState() {
+        String state = "";
+        state += getLeft() + DATASEPARATOR + getRight() + DATASEPARATOR + getTop() + DATASEPARATOR + getBottom();
+        return state;
+    }
+
 	/*
 	 * @return random number between MINVALUE and MAXVALUE.
 	 * @see MINVALUE

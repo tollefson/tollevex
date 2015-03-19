@@ -1,7 +1,7 @@
 /*
 tollevex - a tetravex like game
 
-Copyright 2014 Jon Tollefson <jon@tollefoto.com>
+Copyright 2014,2015 Jon Tollefson <jon@tollefoto.com>
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -19,6 +19,7 @@ limitations under the License.
 package com.tollefoto.tetravex;
 
 import android.content.Context;
+import android.content.res.Configuration;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -67,7 +68,11 @@ public class TileAdapter extends BaseAdapter {
         TileData tileData = mGameBoardData.getData(position);
         if (convertView == null) {  // if it's not recycled, initialize some attributes
             tileView = new TileView(mContext, null);
-            int w = mContext.getResources().getDisplayMetrics().widthPixels;
+            int w;
+            if(mContext.getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE)
+                w = mContext.getResources().getDisplayMetrics().heightPixels;
+            else
+                w = mContext.getResources().getDisplayMetrics().widthPixels;
             tileView.setLayoutParams(new GridView.LayoutParams(w/mGameBoardData.getSize()-5,
             		w/mGameBoardData.getSize()-5));
             tileView.setPadding(0, 0, 0, 0);
@@ -86,4 +91,4 @@ public class TileAdapter extends BaseAdapter {
     	return mGameBoardData.winner();
     }
 
-};
+}
