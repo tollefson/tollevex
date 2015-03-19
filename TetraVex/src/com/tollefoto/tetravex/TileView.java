@@ -1,7 +1,7 @@
 /*
 tollevex - a tetravex like game
 
-Copyright 2014 Jon Tollefson <jon@tollefoto.com>
+Copyright 2014,2015 Jon Tollefson <jon@tollefoto.com>
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -38,11 +38,13 @@ public class TileView extends View {
 	private final static int NUMBERCOLORMAP[] = {Color.BLACK, Color.rgb(11,124,196), Color.rgb(29,217,224), Color.rgb(186,186,186), Color.rgb(51,213,59),
 			Color.rgb(251,23,68), Color.rgb(205,43,207), Color.rgb(86,150,28), Color.rgb(222, 224, 29), Color.rgb(251,121,6)};
 	private final static int NUMBERTEXTSIZE = 18;
+    private final static int DEFAULTNUMBERCOLOR = Color.BLACK;
+    private final static int DEFAULTBORDERCOLOR = Color.LTGRAY;
+    private final static int SELECTEDBORDERCOLOR = Color.RED;
 
 	/* Number */
 	private Paint mNumberPaint;
 	private float mNumberWidth = 0, mNumberHeight = 0;
-	private int mNumberColor = Color.BLACK;
 	private float mLeftNumberX, mLeftNumberY;
 	private float mRightNumberX, mRightNumberY;
 	private float mTopNumberX, mTopNumberY;
@@ -51,7 +53,6 @@ public class TileView extends View {
 
 	/* Quadrant */
 	private Paint mQuadPaint;
-	private int mBorderColor = Color.DKGRAY;
 	private int mLeftColor, mRightColor, mTopColor, mBottomColor;
 	private float mCenterX, mCenterY;
 	private int mTrianglePathStrokeWidth = 3;
@@ -106,9 +107,10 @@ public class TileView extends View {
 		 canvas.drawPath(mBottomTriangle, mQuadPaint);
 
 		 if(isSelected())
-			 mQuadPaint.setColor(Color.WHITE);
+			 mQuadPaint.setColor(SELECTEDBORDERCOLOR);
 		 else
-			 mQuadPaint.setColor(mBorderColor);
+			 mQuadPaint.setColor(DEFAULTBORDERCOLOR);
+
 		 // Left triangle
 		 canvas.drawLine(mCenterX, mCenterY, mTopLeftX, mTopLeftY, mQuadPaint);
 		 canvas.drawLine(mCenterX, mCenterY, mBottomLeftX, mBottomLeftY, mQuadPaint);
@@ -204,7 +206,7 @@ public class TileView extends View {
 	 private void init(int height) {
 		 if(!mInitialized) {
 			 mNumberPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-			 mNumberPaint.setColor(mNumberColor);
+			 mNumberPaint.setColor(DEFAULTNUMBERCOLOR);
 			 DisplayMetrics dm = getContext().getResources().getDisplayMetrics();
 			 mTrianglePathStrokeWidth =  3;
 			 /*make the numbers as big as we can based on the height of the tile and the density of the display*/
@@ -218,7 +220,7 @@ public class TileView extends View {
 			 }
 	
 			 mQuadPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-			 mQuadPaint.setColor(mBorderColor);
+			 mQuadPaint.setColor(DEFAULTBORDERCOLOR);
 		 } else
 			 mInitialized = true;
 	 }
